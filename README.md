@@ -36,7 +36,3 @@ Nothing but see the code of something that you have not done before and you want
 
 
 
-
-
-## License
-This project is under the lincese **Creative Common Zero**. [Learn more about it here](https://creativecommons.org/public-domain/cc0/)
