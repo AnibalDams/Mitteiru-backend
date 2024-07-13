@@ -18,37 +18,43 @@ class Anime:
         self.genres=genres 
 
     def new(self):
-        # This is the query used to create the anime
-        createAnimeQuery= "INSERT INTO Animes(name,synopsis,releaseYear,studio,cover,image,onGoing,horizontal_image) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
-    
-        # The functions that are used to create the anime
-        db.dbCursor.execute(createAnimeQuery,[self.name,self.synopsis,self.releaseYear,self.studio,self.cover,self.image,self.onGoing,self.horizontalImage])
-        db.db.commit()
-
-        # Save the animeId to use it then
-        animeId = db.dbCursor.lastrowid
-
-        # Get every genre in the array to store it in the db
-        for genre in self.genres:
-
-            # Check if the genre already exists
-            doesItExistQuery="SELECT * FROM Genres WHERE name=%s"
-            db.dbCursor.execute(doesItExistQuery,[genre ])
-            doesItExist = db.dbCursor.fetchall()
-
-            if len(doesItExist) <=0 or doesItExist==[]:
-                # If it doesn't exist store it in both tables, Genres and Genre
-                createGenreWithAnime = "INSERT INTO Genres(name,anime_id) VALUES(%s,%s)"
-                createGenreWithoutAnime = "INSERT INTO Genre(name) VALUES(%s)"
-                db.dbCursor.execute(createGenreWithAnime , [genre,animeId])
-                db.dbCursor.execute(createGenreWithoutAnime, [genre])
-                db.db.commit()
-            
-            # if it does exist, store it just in the Genres table
-            createGenreWithAnime = "INSERT INTO Genres(name,anime_id) VALUES(%s,%s)"
-            
-            db.dbCursor.execute(createGenreWithAnime , [genre,animeId])
+        try:
+            # This is the query used to create the anime
+            createAnimeQuery= "INSERT INTO Animes(name,synopsis,releaseYear,studio,cover,image,onGoing,horizontal_image) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
+        
+            # The functions that are used to create the anime
+            db.dbCursor.execute(createAnimeQuery,[self.name,self.synopsis,self.releaseYear,self.studio,self.cover,self.image,self.onGoing,self.horizontalImage])
             db.db.commit()
+
+            # Save the animeId to use it then
+            animeId = db.dbCursor.lastrowid
+
+            # Get every genre in the array to store it in the db
+            for genre in self.genres:
+
+                # Check if the genre already exists
+                doesItExistQuery="SELECT * FROM Genres WHERE name=%s"
+                db.dbCursor.execute(doesItExistQuery,[genre ])
+                doesItExist = db.dbCursor.fetchall()
+
+                if len(doesItExist) <=0 or doesItExist==[]:
+                    # If it doesn't exist store it in both tables, Genres and Genre
+                    createGenreWithAnime = "INSERT INTO Genres(name,anime_id) VALUES(%s,%s)"
+                    createGenreWithoutAnime = "INSERT INTO Genre(name) VALUES(%s)"
+                    db.dbCursor.execute(createGenreWithAnime , [genre,animeId])
+                    db.dbCursor.execute(createGenreWithoutAnime, [genre])
+                    db.db.commit()
+                else:
+                
+                    # if it does exist, store it just in the Genres table
+                    createGenreWithAnime = "INSERT INTO Genres(name,anime_id) VALUES(%s,%s)"
+                
+                    db.dbCursor.execute(createGenreWithAnime , [genre,animeId])
+                    db.db.commit()
+            return {"message":"The anime has been created"}
+        except Exception as e:
+            return {"message":"An unknown error has occurred has happened while creating the anime", "error":e.args}
+
             
 
     

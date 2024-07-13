@@ -1,6 +1,6 @@
 import json
 from flask import Flask, jsonify,request
-from flask_cors import CORS,cross_origin
+from flask_cors import CORS,cross_origin, make_response
 from routes import createAnime, allAnimes, getAnime, getAllGenres, login, newProfile,newUser,getProfiles, removeFromL,updateAnime,newEpisode, updateProfile, getEpisodes,addToList,getList,getEpisode,getAnimesWithTheGenre,deleteProfile, getAnimesOfAnStudio, getSimilarAnime
 from classes import users
 
@@ -77,15 +77,16 @@ def getL(profileId:int):
 # Route that creates a new anime with the given data using the createAnime funtion created in the routes folder
 @app.route("/anime/new", methods=["POST"])
 def create(): 
-    # Get the body data 
-    anime = json.loads(request.data)
-    
-    # Create the anime using the function giving the  given data in the body
-    
-    
+    try:
+        # Get the body data 
+        anime = json.loads(request.data)
 
-    #return a message
-    return jsonify(createAnime.createAnime(anime))
+        # Create the anime using the function giving the given data in the body and return the result
+        return createAnime.create(anime)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An unknown error has occurred" , "error":e.args}))
+        resp.status_code=500
+        return resp
 
 @app.route("/anime/<int:animeId>/episode/new",methods=["POST"])
 def createEpisode(animeId:int):
