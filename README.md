@@ -1,5 +1,7 @@
 # What does this API do?
 
+> [!NOTE]
+> **You must have already installed MySQL, flask, and the MySQL Driver for python for the correct functioning of the API**
 
 This API provides you **a variety of routes to build an anime streaming app** (In any platforms). It makes your app able to: 
 - create users 
