@@ -26,15 +26,10 @@ This API provides you **a variety of routes to build an anime streaming app** (I
 > [!NOTE]
 > **These are the features that are available until a certain point in the development, more features can be added later, and if that is so, they will be listed here**
 
-
 # Is it usable?
 
 Well, yes, it is usable. I do use it in the project shown in [this repository](https://github.com/AnibalDams/Mitteiru) and it is fully functional in those projects, **BUT these projects are made just for praticing python, Flask, MySQL, Svelte, etc. So I do not reccoment use it in a project that is not just for practicing something.** I do not verify a lot of things, I do not use a token based authentication, I do not use Authorizations headers, I do not encrypt nothing, and more things like that. And of course, surely there are a ton of errors that i did not see when i was coding them.
 
 #### *So, What can i do with this project?*
 
-Nothing but see the code of something that you have not done before and you want to know a way to do it or you have a practice front-end project that fits with this API and you do not want to code a back-endT
-
-
-
-
+Nothing but see the code of something that you have not done before and you want to know a way to do it or you have a practice front-end project that fits with this API and you do not want to code a back-end.
