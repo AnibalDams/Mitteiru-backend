@@ -29,8 +29,9 @@ def getAllAnimes():
     except Exception as e:
         resp = make_response(jsonify({"message":"An unknown error has occurred", "error":e.args}))
         resp.status_code = 500
+        return resp
 
-        
+
 @app.route("/anime/<int:animeId>")
 def getOneAnime(animeId:int):
     return getAnime.getAnime(animeId)
