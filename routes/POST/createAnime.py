@@ -1,16 +1,15 @@
 from classes import animes
 from flask import make_response,jsonify
 
-
-
 # This function creates a new anime
-def createAnime(animeData):
+def create(animeData):
     try:
         if not animeData["admin"]:
             return {"message":"You don't have admin privilegies"}
         anime = animes.Anime(name=animeData["name"],synopsis=animeData["synopsis"],releaseYear=animeData["releaseYear"],studio=animeData["studio"],cover=animeData["cover"],image=animeData["image"],onGoing=animeData["onGoing"],genres=animeData["genres"],horizontalImage=animeData["horizontalImage"])
         newAnime = anime.new()
         if newAnime["message"]=="The anime has been created":
+
             resp = make_response(jsonify({"message":"The anime have been added"}))
             resp.status_code = 201
             return resp
@@ -29,5 +28,3 @@ def createAnime(animeData):
         resp=make_response(jsonify({"message":"An unknown error has occurred","error":e.args}))
         resp.status_code = 500
         return resp
-
-        

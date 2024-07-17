@@ -1,7 +1,11 @@
 import json
 from flask import Flask, jsonify,request
 from flask_cors import CORS,cross_origin, make_response
-from routes import createAnime, allAnimes, getAnime, getAllGenres, login, newProfile,newUser,getProfiles, removeFromL,updateAnime,newEpisode, updateProfile, getEpisodes,addToList,getList,getEpisode,getAnimesWithTheGenre,deleteProfile, getAnimesOfAnStudio, getSimilarAnime
+from routes.DELETE import deleteProfile, removeFromL
+from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime
+from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser
+from routes.PUT import updateAnime
+
 from classes import users
 
 app = Flask(__name__)
@@ -20,8 +24,13 @@ def hello():
 
 @app.route("/anime/all")
 def getAllAnimes():
-    return jsonify(allAnimes.getAllAnimes()), {"Access-Control-Allow-Origin":"*"}
+    try:
+        return allAnimes.getAllAnimes()
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An unknown error has occurred", "error":e.args}))
+        resp.status_code = 500
 
+        
 @app.route("/anime/<int:animeId>")
 def getOneAnime(animeId:int):
     return getAnime.getAnime(animeId)

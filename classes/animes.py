@@ -59,12 +59,15 @@ class Anime:
 
     
     def getAll(self):
-        getAllAnimesQuery = "SELECT * FROM Animes ORDER BY Animes.id DESC"
-        db.dbCursor.execute(getAllAnimesQuery)
-        animes = db.dbCursor.fetchall()
-        if not animes:
-            return {"message":"no animes was found"}
-        return {"message":str(len(animes))+" "+"animes was found","animes":animes}
+        try:
+            getAllAnimesQuery = "SELECT * FROM Animes ORDER BY Animes.id DESC"
+            db.dbCursor.execute(getAllAnimesQuery)
+            animes = db.dbCursor.fetchall()
+            if not animes:
+                return {"message":"no animes was found"}
+            return {"message":"Animes found","animes":animes}
+        except Exception as e:
+            return {"message":"There was an error while getting the animes", "errors":e.args}
     
     def getOne(self):
         getAnimeQuery="SELECT * FROM Animes WHERE id=%s"
