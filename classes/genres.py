@@ -20,18 +20,14 @@ class Genre:
     
 
     def getAnimesOfAGenre(self):
-        animesWithTheGenre = []
-        allAnimes = animes.Anime().getAll()["animes"]
-        getAnimesWithTheGenre = "SELECT anime_id from Genres WHERE name=%s"
+        getAnimesWithTheGenre = "SELECT Animes.id, Animes.name, Animes.synopsis, Animes.releaseYear, Animes.studio, Animes.cover, Animes.image, Animes.onGoing, Animes.views_, Animes.horizontal_image FROM Genres INNER JOIN Animes on Animes.id = anime_id WHERE Genres.name=%s;"
         db.dbCursor.execute(getAnimesWithTheGenre,[self.genre])
-        idAnimesWithTheGenre = db.dbCursor.fetchall()
+        animesWithTheGenre = db.dbCursor.fetchall()
 
-        if len(idAnimesWithTheGenre) <=0:
+        if len(animesWithTheGenre) <=0:
             return jsonify({"message":"No animes found with this genre"}), 404
-        for genre in idAnimesWithTheGenre:
-            for anime in allAnimes:
-                if anime[0] == int(genre[0]):
-                    animesWithTheGenre.append(anime)
+
+        
 
         return jsonify({"animes":animesWithTheGenre}), 200
 

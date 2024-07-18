@@ -70,22 +70,24 @@ class Anime:
             return {"message":"There was an error while getting the animes", "errors":e.args}
     
     def getOne(self):
-        getAnimeQuery="SELECT * FROM Animes WHERE id=%s"
-        updateViewsCounterQuery="UPDATE Animes SET views_=%s WHERE id=%s"
+        try:
+            getAnimeQuery="SELECT * FROM Animes WHERE id=%s"
+            updateViewsCounterQuery="UPDATE Animes SET views_=%s WHERE id=%s"
 
-        getAnimeGenresQuery="SELECT * FROM Genres WHERE anime_id=%s"
-        db.dbCursor.execute(getAnimeQuery,[self.id])
-        anime = db.dbCursor.fetchone()
-        if not anime:
-            return jsonify({"message":"No anime found"}),404
-        newViewsNumber= anime[8] + 1
-        
-        db.dbCursor.execute(updateViewsCounterQuery, [newViewsNumber,self.id])
-        db.dbCursor.execute(getAnimeGenresQuery,[self.id])
-        db.db.commit()
-        genres = db.dbCursor.fetchall()
-        return jsonify({"anime":{"id":anime[0],"name":anime[1],"synopsis":anime[2],"releaseYear":anime[3],"studio":anime[4],"cover":anime[5],"image":anime[6],"horizontalImage":anime[9],"onGoing":anime[7],"views":anime[8]},"genres":genres,"message":""}),200
-
+            getAnimeGenresQuery="SELECT * FROM Genres WHERE anime_id=%s"
+            db.dbCursor.execute(getAnimeQuery,[self.id])
+            anime = db.dbCursor.fetchone()
+            if not anime:
+                return {"message":"No anime found"}
+            newViewsNumber= anime[8] + 1
+            
+            db.dbCursor.execute(updateViewsCounterQuery, [newViewsNumber,self.id])
+            db.dbCursor.execute(getAnimeGenresQuery,[self.id])
+            db.db.commit()
+            genres = db.dbCursor.fetchall()
+            return {"anime":{"id":anime[0],"name":anime[1],"synopsis":anime[2],"releaseYear":anime[3],"studio":anime[4],"cover":anime[5],"image":anime[6],"horizontalImage":anime[9],"onGoing":anime[7],"views":anime[8]},"genres":genres,"message":"The anime was found"}
+        except Exception as e:
+            return {"message":"An error has occurred while gettin the anime","error":e.args}
 
     def updateAnime(self):
         doesTheAnimeExistQuery="SELECT name FROM Animes WHERE id=%s"
