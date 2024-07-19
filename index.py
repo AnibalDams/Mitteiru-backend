@@ -4,7 +4,7 @@ from flask_cors import CORS,cross_origin, make_response
 from routes.DELETE import deleteProfile, removeFromL
 from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime
 from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser
-from routes.PUT import updateAnime
+from routes.PUT import updateAnime,updateProfile
 
 from classes import users
 
@@ -65,7 +65,12 @@ def getAG(genre):
 
 @app.route("/anime/studio/<studio>")
 def getAS(studio):
-    return getAnimesOfAnStudio.get(studio)
+    try:
+        return getAnimesOfAnStudio.get(studio)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An unknown error has occurred", "error":e.args}))
+        resp.status_code = 500
+        return resp
 
 @app.route("/anime/<int:animeId>/similar")
 def getSimilar(animeId:int):
@@ -142,13 +147,18 @@ def add(profileId:int):
 
 @app.route("/anime/<int:animeId>/update",methods=["PUT"])
 def update(animeId:int):
-    animeData = json.loads(request.data) 
-    return jsonify(updateAnime.update(animeId,animeData))   
+    try:
+        animeData = json.loads(request.data) 
+        return jsonify(updateAnime.update(animeId,animeData))
+    except Exception as e:
+        resp = make_response({"message":"An error has occurred", "error":e.args})
+        resp.status_code = 500
+        return resp   
 
 @app.route("/user/profile/<int:profileId>")
 def updateP(profileId:int):
     profileData = json.loads(request.data)
-    return jsonify(updateProfile.update())
+    return jsonify(updateProfile.update(profileId,profileData))
 
 
 

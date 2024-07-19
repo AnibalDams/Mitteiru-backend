@@ -90,27 +90,33 @@ class Anime:
             return {"message":"An error has occurred while gettin the anime","error":e.args}
 
     def updateAnime(self):
-        doesTheAnimeExistQuery="SELECT name FROM Animes WHERE id=%s"
-        db.dbCursor.execute(doesTheAnimeExistQuery, [self.id])
-        doesTheAnimeExist=db.dbCursor.fetchall()
-        if not doesTheAnimeExist:
-            return {"message":"The given id doesn't match with any anime, check it"}
-        updateAnimeQuery = "UPDATE Animes SET name=%s,synopsis=%s,releaseYear=%s,studio=%s,cover=%s,image=%s,horizontal_image=%s,onGoing=%s"
-        db.dbCursor.execute(updateAnimeQuery,[self.name,self.synopsis,self.releaseYear,self.studio,self.cover,self.image,self.horizontalImage,self.onGoing])
-        db.db.commit()
-        return {"message":"The anime have been updated"}
+        try:
+            doesTheAnimeExistQuery="SELECT name FROM Animes WHERE id=%s"
+            db.dbCursor.execute(doesTheAnimeExistQuery, [self.id])
+            doesTheAnimeExist=db.dbCursor.fetchall()
+            if not doesTheAnimeExist:
+                return {"message":"The given id doesn't match with any anime, check it"}
+            updateAnimeQuery = "UPDATE Animes SET name=%s,synopsis=%s,releaseYear=%s,studio=%s,cover=%s,image=%s,horizontal_image=%s,onGoing=%s"
+            db.dbCursor.execute(updateAnimeQuery,[self.name,self.synopsis,self.releaseYear,self.studio,self.cover,self.image,self.horizontalImage,self.onGoing])
+            db.db.commit()
+            return {"message":"The anime have been updated"}
+        except Exception as e:
+            return {"message":"An error has occurred while updating the anime data","error":e.args}  
     
     def getAnimesOfAnStudio(self):
-        getQuery = "SELECT * FROM Animes WHERE studio=%s"
+        try:
+            getQuery = "SELECT * FROM Animes WHERE studio=%s"
 
-        db.dbCursor.execute(getQuery,[self.studio])
+            db.dbCursor.execute(getQuery,[self.studio])
 
-        animes = db.dbCursor.fetchall()
+            animes = db.dbCursor.fetchall()
 
-        if not animes:
-            return jsonify({"message":"No animes were found"}), 404
-        
-        return jsonify({"animes":animes}),200
+            if not animes:
+                return {"message":"No animes were found"} 
+            
+            return {"animes":animes, "message":"Animes found"}
+        except Exception as e:
+            return {"message":"An error has occurred while getting the animes","error":e.args}
 
     def getSimilarAnime(self):
         similarAnime=[]
