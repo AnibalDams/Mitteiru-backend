@@ -1,5 +1,8 @@
 # What does this API do?
 
+> [!TIP]
+> I'd love it if you could give me any kind of feedback or advice about this project that could help me as a programmer.
+
 > [!NOTE]
 > **You must have already installed MySQL, flask, and the MySQL Driver for python for the correct functioning of the API**
 
