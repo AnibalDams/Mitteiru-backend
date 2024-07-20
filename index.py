@@ -1,12 +1,12 @@
 import json
-from flask import Flask, jsonify,request
-from flask_cors import CORS,cross_origin, make_response
+from flask import Flask, jsonify,request,make_response
+from flask_cors import CORS,cross_origin
+from routes.PUT import  updateProfile
+from classes import users
 from routes.DELETE import deleteProfile, removeFromL
 from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime
 from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser
-from routes.PUT import updateAnime,updateProfile
-
-from classes import users
+from routes.PUT import updateAnime
 
 app = Flask(__name__)
 
@@ -14,6 +14,7 @@ CORS(app)
 
 
 
+# GET routes
 
 # Hellow world route
 @app.route("/")
@@ -29,17 +30,16 @@ def getAllAnimes():
     except Exception as e:
         resp = make_response(jsonify({"message":"An unknown error has occurred", "error":e.args}))
         resp.status_code = 500
-        return resp
-
 
 @app.route("/anime/<int:animeId>")
 def getOneAnime(animeId:int):
     try:
         return getAnime.getAnime(animeId)
     except Exception as e:
-        resp = make_response(jsonify({"message":"An unknown error has occurred", "error":e.args}))
+        resp = make_response(jsonify({"message":"There was an unknown error","error":e.args}))
         resp.status_code = 500
-        return resp
+        return resp 
+
 
 @app.route("/anime/genre/all")
 def allGenres():
@@ -48,7 +48,7 @@ def allGenres():
 
 
 @app.route("/anime/<int:animeId>/episode/all")
-def get(animeId:int):
+def get_episodes(animeId:int):
     return jsonify(getEpisodes.get(animeId))
 
 
@@ -74,7 +74,12 @@ def getAS(studio):
 
 @app.route("/anime/<int:animeId>/similar")
 def getSimilar(animeId:int):
-    return getSimilarAnime.get(animeId)
+    try:
+        return getSimilarAnime.get(animeId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred", "error":e.args}))
+        resp.status_code = 500
+        return resp
 
 
 @app.route("/user/<int:userId>/profile/all")
@@ -92,7 +97,7 @@ def getL(profileId:int):
 
 
 
-# POST
+# POST routes
 # Route that creates a new anime with the given data using the createAnime funtion created in the routes folder
 @app.route("/anime/new", methods=["POST"])
 def create(): 
@@ -107,10 +112,17 @@ def create():
         resp.status_code=500
         return resp
 
+
+
 @app.route("/anime/<int:animeId>/episode/new",methods=["POST"])
 def createEpisode(animeId:int):
-    episodeData = json.loads(request.data)
-    return jsonify(newEpisode.new(animeId,episodeData))
+    try:
+        episodeData = json.loads(request.data)
+        return newEpisode.new(animeId,episodeData)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred", "error":e.args}))
+        resp.status_code = 500
+        return resp
 
 
 @app.route("/user/new", methods=["POST"])
@@ -149,12 +161,11 @@ def add(profileId:int):
 def update(animeId:int):
     try:
         animeData = json.loads(request.data) 
-        return jsonify(updateAnime.update(animeId,animeData))
+        return updateAnime.update(animeId,animeData)   
     except Exception as e:
         resp = make_response({"message":"An error has occurred", "error":e.args})
         resp.status_code = 500
-        return resp   
-
+        return resp
 @app.route("/user/profile/<int:profileId>")
 def updateP(profileId:int):
     profileData = json.loads(request.data)

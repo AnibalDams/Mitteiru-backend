@@ -1,6 +1,7 @@
 from libs import db
 from flask import jsonify
 from classes import genres
+import random
 
 class Anime:
 
@@ -21,7 +22,7 @@ class Anime:
         try:
             # This is the query used to create the anime
             createAnimeQuery= "INSERT INTO Animes(name,synopsis,releaseYear,studio,cover,image,onGoing,horizontal_image) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
-        
+
             # The functions that are used to create the anime
             db.dbCursor.execute(createAnimeQuery,[self.name,self.synopsis,self.releaseYear,self.studio,self.cover,self.image,self.onGoing,self.horizontalImage])
             db.db.commit()
@@ -45,19 +46,20 @@ class Anime:
                     db.dbCursor.execute(createGenreWithoutAnime, [genre])
                     db.db.commit()
                 else:
-                
+
                     # if it does exist, store it just in the Genres table
                     createGenreWithAnime = "INSERT INTO Genres(name,anime_id) VALUES(%s,%s)"
-                
+
                     db.dbCursor.execute(createGenreWithAnime , [genre,animeId])
                     db.db.commit()
+            
             return {"message":"The anime has been created"}
         except Exception as e:
             return {"message":"An unknown error has occurred has happened while creating the anime", "error":e.args}
 
-            
 
-    
+
+
     def getAll(self):
         try:
             getAllAnimesQuery = "SELECT * FROM Animes ORDER BY Animes.id DESC"
@@ -70,6 +72,7 @@ class Anime:
             return {"message":"There was an error while getting the animes", "errors":e.args}
     
     def getOne(self):
+        
         try:
             getAnimeQuery="SELECT * FROM Animes WHERE id=%s"
             updateViewsCounterQuery="UPDATE Animes SET views_=%s WHERE id=%s"
@@ -101,8 +104,9 @@ class Anime:
             db.db.commit()
             return {"message":"The anime have been updated"}
         except Exception as e:
-            return {"message":"An error has occurred while updating the anime data","error":e.args}  
-    
+            return {"message":"An error has occurred while updating the anime data","error":e.args}
+
+
     def getAnimesOfAnStudio(self):
         try:
             getQuery = "SELECT * FROM Animes WHERE studio=%s"
@@ -112,27 +116,30 @@ class Anime:
             animes = db.dbCursor.fetchall()
 
             if not animes:
-                return {"message":"No animes were found"} 
+                return {"message":"No animes were found"}
             
             return {"animes":animes, "message":"Animes found"}
         except Exception as e:
             return {"message":"An error has occurred while getting the animes","error":e.args}
 
     def getSimilarAnime(self):
-        similarAnime=[]
+        try:
+            similarAnime=[]
 
-        db.dbCursor.execute("SELECT * FROM Genres WHERE anime_id=%s",[self.id])
-        genresOfTheAnime = db.dbCursor.fetchall()
-
-        db.dbCursor.execute("SELECT anime_id FROM Genres WHERE name=%s",[genresOfTheAnime[0][1]])
-        animes = db.dbCursor.fetchall()
-
-        for animeWithTheGenre in animes:
+            db.dbCursor.execute("SELECT * FROM Genres WHERE anime_id=%s",[self.id])
+            genresOfTheAnime = db.dbCursor.fetchall()
+            genreIndex = random.randint(0,len(genresOfTheAnime)-1)
+            db.dbCursor.execute("SELECT anime_id FROM Genres WHERE name=%s",[genresOfTheAnime[genreIndex][1]])
+            animes = db.dbCursor.fetchall()
             
-            if int(animeWithTheGenre[0]) != self.id:
-                similarAnime.append(animeWithTheGenre)
+            for animeWithTheGenre in animes:
+                
+                if int(animeWithTheGenre[0]) != self.id:
+                    similarAnime.append(animeWithTheGenre)
 
-        return {"animes":similarAnime}
+            return {"animes":similarAnime, "message":"Animes found"}
+        except Exception as e:
+            return {"message":"An error has occurred while getting the anime", "error":e.args}
                 
 
         

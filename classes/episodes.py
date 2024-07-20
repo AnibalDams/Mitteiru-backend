@@ -13,17 +13,20 @@ class Episode:
         self.link=link
 
     def new(self):
-        doesTheAnimeExistQuery = "SELECT name FROM Animes WHERE id=%s"
-        db.dbCursor.execute(doesTheAnimeExistQuery,[self.animeId])
-        doesTheAnimeExist = db.dbCursor.fetchall()
+        try:
+            doesTheAnimeExistQuery = "SELECT name FROM Animes WHERE id=%s"
+            db.dbCursor.execute(doesTheAnimeExistQuery,[self.animeId])
+            doesTheAnimeExist = db.dbCursor.fetchall()
 
-        if not doesTheAnimeExist:
-            return {"message":"The given anime doesn't exist"}
-        
-        newEpisodeQuery = "INSERT INTO Episodes(anime_id,episode_number,episode_title,episode_synopsis,thumbnail,link) VALUES(%s,%s,%s,%s,%s,%s)"
-        db.dbCursor.execute(newEpisodeQuery,[self.animeId,self.episodeNumber,self.episodeTitle,self.episodeSynopsis,self.thumbnail,self.link])
-        db.db.commit()
-        return {"message":"A new episode has been added"}
+            if not doesTheAnimeExist:
+                return {"message":"The given anime doesn't exist"}
+            
+            newEpisodeQuery = "INSERT INTO Episodes(anime_id,episode_number,episode_title,episode_synopsis,thumbnail,link) VALUES(%s,%s,%s,%s,%s,%s)"
+            db.dbCursor.execute(newEpisodeQuery,[self.animeId,self.episodeNumber,self.episodeTitle,self.episodeSynopsis,self.thumbnail,self.link])
+            db.db.commit()
+            return {"message":"A new episode has been added"}
+        except Exception as e:
+            return {"message":"An error has occurred while creating the episode", "error":e.args}
 
     def getAllEpisodes(self):
         doesTheAnimeExistQuery = "SELECT name FROM Animes WHERE id=%s"
