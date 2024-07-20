@@ -104,3 +104,6 @@ db = mysql.connector.connect(
   - **user_id**
   - **photo**
   - **name**
+
+> [!NOTE]
+> **These tables can be changed, updated, or deleted during the development, if that is so, The new changes will be added here**
