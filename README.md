@@ -54,6 +54,7 @@ python index.py
 
 > [!WARNING]
 > **You have to make sure that you have installed mysql in your system and change the values in the database connection function in the libs/db.py file for your database's name, your user, and your password.**
+
 > [!WARNING]
 > **In your database, You have to already have all the needed tables to the correct functioning of the API**
 
