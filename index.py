@@ -49,13 +49,23 @@ def allGenres():
 
 @app.route("/anime/<int:animeId>/episode/all")
 def get_episodes(animeId:int):
-    return jsonify(getEpisodes.get(animeId))
+    try:
+        return getEpisodes.get(animeId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred", "error":e.args}))
+        resp.status_code = 500
+        return resp
 
 
 
 @app.route("/anime/<int:animeId>/episode/<int:episodeNumber>")
 def getOneEpisode(animeId:int,episodeNumber:int):
-    return getEpisode.get(animeId,episodeNumber)
+    try:
+        return getEpisode.get(animeId,episodeNumber)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred", "error":e.args }))
+        resp.status_code = 500
+        return resp
 
 
 @app.route("/anime/genre/<genre>")

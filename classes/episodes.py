@@ -29,28 +29,34 @@ class Episode:
             return {"message":"An error has occurred while creating the episode", "error":e.args}
 
     def getAllEpisodes(self):
-        doesTheAnimeExistQuery = "SELECT name FROM Animes WHERE id=%s"
-        db.dbCursor.execute(doesTheAnimeExistQuery,[self.animeId])
-        doesTheAnimeExist = db.dbCursor.fetchall()
+        try:
+            doesTheAnimeExistQuery = "SELECT name FROM Animes WHERE id=%s"
+            db.dbCursor.execute(doesTheAnimeExistQuery,[self.animeId])
+            doesTheAnimeExist = db.dbCursor.fetchall()
 
-        if not doesTheAnimeExist:
-            return {"message":"The given anime doesn't exist"}
-        getEpisodesQuery = "SELECT * FROM Episodes WHERE anime_id=%s ORDER BY Episodes.id ASC"
+            if not doesTheAnimeExist:
+                return {"message":"The given anime doesn't exist"}
+            getEpisodesQuery = "SELECT * FROM Episodes WHERE anime_id=%s ORDER BY Episodes.id ASC"
 
-        db.dbCursor.execute(getEpisodesQuery,[self.animeId])
+            db.dbCursor.execute(getEpisodesQuery,[self.animeId])
 
-        episodes = db.dbCursor.fetchall()
+            episodes = db.dbCursor.fetchall()
 
-        return {"episodes":episodes}
+            return {"episodes":episodes, "message":"episodes found"}
+        except Exception as e:
+            return {"message":"An error has occurred while getting episodes", "error":e.args}
     
     def getOneEpisode(self):
-        getEpisodeQuery = "SELECT * FROM Episodes WHERE anime_id=%s AND episode_number=%s"
+        try:
+            getEpisodeQuery = "SELECT * FROM Episodes WHERE anime_id=%s AND episode_number=%s"
 
-        db.dbCursor.execute(getEpisodeQuery, [self.animeId,self.episodeNumber])
+            db.dbCursor.execute(getEpisodeQuery, [self.animeId,self.episodeNumber])
 
-        episode = db.dbCursor.fetchone()
+            episode = db.dbCursor.fetchone()
 
-        if not episode:
-            return jsonify({"message":"episode not found"}), 404
-        
-        return jsonify(episode), 200
+            if not episode:
+                return {"message":"episode not found"}
+            
+            return {"episode":episode, "message":"Episode found"}
+        except Exception as e:
+            return {"message":"An error has occurred while getting the episode", "error":e.args}
