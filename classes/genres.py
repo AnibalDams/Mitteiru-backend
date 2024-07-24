@@ -11,12 +11,15 @@ class Genre:
         self.animeId=animeId
 
     def getAllGenres(self):
-        getAllGenresQuery = "SELECT * FROM Genre ORDER BY name ASC"
-        db.dbCursor.execute(getAllGenresQuery)
-        genres = db.dbCursor.fetchall()
-        if not genres:
-            return {"message":"no genres were found"}
-        return {"message":str(len(genres))+" "+"genres were found","genres":genres}
+        try:
+            getAllGenresQuery = "SELECT * FROM Genre ORDER BY name ASC"
+            db.dbCursor.execute(getAllGenresQuery)
+            genres = db.dbCursor.fetchall()
+            if not genres:
+                return {"message":"no genres were found"}
+            return {"message":"genres found","genres":genres}
+        except Exception as e:
+            return  {"message":"An error has occurred while getting the list of genres", "error":e.args}
     
 
     def getAnimesOfAGenre(self):

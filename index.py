@@ -43,8 +43,12 @@ def getOneAnime(animeId:int):
 
 @app.route("/anime/genre/all")
 def allGenres():
-    return jsonify(getAllGenres.getAllGenres())
-
+    try:
+        return getAllGenres.getAllGenres()
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An unknown error has occurred"}))
+        resp.status_code = 500
+        return resp 
 
 
 @app.route("/anime/<int:animeId>/episode/all")
