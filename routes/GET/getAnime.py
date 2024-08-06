@@ -1,7 +1,6 @@
 from classes import animes
 from flask import make_response, jsonify
 
-
 def getAnime(animeId):
     try:
         anime = animes.Anime(id=animeId)

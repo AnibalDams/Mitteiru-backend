@@ -4,7 +4,7 @@ from flask import make_response, jsonify
 def get(studio):
     try:
         anime = animes.Anime(studio=studio)
-        getAnimes = anime.getAnimesOfAnStudio() 
+        getAnimes =anime.getAnimesOfAnStudio() 
         match getAnimes["message"]:
             case "No animes were found":
                 resp = make_response(jsonify(getAnimes))
@@ -18,6 +18,7 @@ def get(studio):
                 resp = make_response(jsonify(getAnimes))
                 resp.status_code = 200
                 return resp
+    
     except Exception as e:
         resp = make_response(jsonify({"message":"An error has occurred", "error":e.args}))
         resp.status_code = 500

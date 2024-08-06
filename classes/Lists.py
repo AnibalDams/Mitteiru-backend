@@ -3,9 +3,10 @@ from libs import db
 
 class List:
 
-    def __init__(self,id=0,profileId=0,animeId=0,animeTitle="",animeSynopsis="",animeCover="",animeImage=""):
+    def __init__(self,id=0,profileId=0,name="",animeId=0,animeTitle="",animeSynopsis="",animeCover="",animeImage=""):
             self.id = id
             self.profileId = profileId
+            self.name = name
             self.animeId=animeId
             self.animeTitle = animeTitle
             self.animeSynopsis=animeSynopsis
@@ -14,21 +15,24 @@ class List:
 
 
     def new(self):
-        doesTheProfileExistQuery = "SELECT id FROM Profiles WHERE id=%s"
+        try:
+            doesTheProfileExistQuery = "SELECT id FROM Profiles WHERE id=%s"
 
-        db.dbCursor.execute(doesTheProfileExistQuery,[self.profileId])
+            db.dbCursor.execute(doesTheProfileExistQuery,[self.profileId])
 
-        doesTheProfileExist = db.dbCursor.fetchall()
+            doesTheProfileExist = db.dbCursor.fetchall()
 
-        if not doesTheProfileExist:
-            return {"message":"The given profile does not exist"}
+            if not doesTheProfileExist:
+                return {"message":"The given profile does not exist"}
 
-        newAnimeToListQuery = "INSERT INTO Lists(profile_id,anime_id,anime_title,anime_synopsis,anime_cover,anime_image) VALUES(%s,%s,%s,%s,%s,%s)"
+            newListQuery = "INSERT INTO List_names(name,profile_id) VALUES(%s,%s)"
 
-        db.dbCursor.execute(newAnimeToListQuery,[self.profileId,self.animeId,self.animeTitle,self.animeSynopsis,self.animeCover,self.animeImage])
-        db.db.commit()
+            db.dbCursor.execute(newListQuery,[self.name,self.profileId])
+            db.db.commit()
 
-        return {"message":"The given anime has been added to the list"}
+            return {"message":"A new list has been created"}
+        except Exception as e:
+             return {"message":"An error has occurred while createing the list", "error":e.args}
     
 
     def remove(self):
@@ -38,19 +42,17 @@ class List:
         return {"message":"The anime has benn deleted from the list"}
 
     def getAll(self):
-        doesTheProfileExistQuery = "SELECT id FROM Profiles WHERE id=%s"
+        try:
+            doesTheProfileExistQuery = "SELECT id FROM Profiles WHERE id=%s"
+            db.dbCursor.execute(doesTheProfileExistQuery,(self.profileId,))
+            doesTheProfileExist = db.dbCursor.fetchall()
 
-        db.dbCursor.execute(doesTheProfileExistQuery,(self.profileId,))
-
-        doesTheProfileExist = db.dbCursor.fetchall()
-
-        if not doesTheProfileExist:
-            return {"message":"The given profile does not exist"}
-        
-        getListQuery = "SELECT * FROM Lists WHERE profile_id=%s"
-
-        db.dbCursor.execute(getListQuery,[self.profileId])
-
-        list = db.dbCursor.fetchall()
-
-        return {"list":list} 
+            if not doesTheProfileExist:
+                return {"message":"The given profile does not exist"}
+            
+            getListQuery = "SELECT * FROM List_names WHERE profile_id=%s"
+            db.dbCursor.execute(getListQuery,[self.profileId])
+            list = db.dbCursor.fetchall()
+            return {"list":list, "message":"Lists found"} 
+        except Exception as e:
+             return {"message":"An error has occurred while getting the list"}

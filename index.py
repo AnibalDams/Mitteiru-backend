@@ -1,11 +1,11 @@
 import json
 from flask import Flask, jsonify,request,make_response
-from flask_cors import CORS,cross_origin
+from flask_cors import CORS
 from routes.PUT import  updateProfile
 from classes import users
 from routes.DELETE import deleteProfile, removeFromL
-from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime
-from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser
+from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime, getAnimesInList
+from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser, addAnimeToList
 from routes.PUT import updateAnime
 
 app = Flask(__name__)
@@ -46,9 +46,10 @@ def allGenres():
     try:
         return getAllGenres.getAllGenres()
     except Exception as e:
-        resp = make_response(jsonify({"message":"An unknown error has occurred"}))
+        resp = make_response(jsonify({"message":"An error has occurrred","error":e.args}))
         resp.status_code = 500
-        return resp 
+        return resp
+
 
 
 @app.route("/anime/<int:animeId>/episode/all")
@@ -74,7 +75,12 @@ def getOneEpisode(animeId:int,episodeNumber:int):
 
 @app.route("/anime/genre/<genre>")
 def getAG(genre):
-    return getAnimesWithTheGenre.get(genre)
+    try:
+        return getAnimesWithTheGenre.get(genre)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp 
 
 
 @app.route("/anime/studio/<studio>")
@@ -98,7 +104,12 @@ def getSimilar(animeId:int):
 
 @app.route("/user/<int:userId>/profile/all")
 def allProfiles(userId:int):
-    return jsonify(getProfiles.getProfiles(userId)), {"Access-Control-Allow-Origin":"*"}
+    try:
+        return getProfiles.getProfiles(userId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code = 500
+        return resp
 
 
 @app.route("/user/<int:userId>")
@@ -107,8 +118,12 @@ def getUser(userId:int):
 
 @app.route("/user/profile/<int:profileId>/list/all")
 def getL(profileId:int):
-    return jsonify(getList.get(profileId))
-
+    try:
+        return getList.get(profileId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp
 
 
 # POST routes
@@ -150,8 +165,13 @@ def createUser():
 
 @app.route("/user/profile/new",methods=["POST"])
 def createProfile():
-    profile=json.loads(request.data)
-    return jsonify(newProfile.create(profile))
+    try:
+        profile=json.loads(request.data)
+        return newProfile.create(profile)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred", "error":e.args}))
+        resp.status_code = 500
+        return resp
 
 @app.route("/user/login",methods=["POST"])
 def enter():
@@ -159,15 +179,33 @@ def enter():
     return jsonify(login.get(userData)), {"Access-Control-Allow-Origin":"*"}
 
 
-@app.route("/user/profile/<int:profileId>/list/add",methods=["POST"])
-def add(profileId:int):
-    body = json.loads(request.data)
-    return jsonify(addToList.add(profileId,body))
+@app.route("/user/profile/<int:profileId>/list/<name>/new",methods=["POST"])
+def add(profileId:int, name):
+    try:
+        return addToList.add(profileId,name)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code = 500
+        return resp 
 
 
+@app.route("/user/profile/<int:profileId>/anime/<int:animeId>/list/<int:listId>/add", methods=["POST"])
+def addAnimeList(profileId:int, animeId:int, listId:int):
+    try:
+        return addAnimeToList.add(animeId,listId,profileId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp
 
-
-
+@app.route("/user/profile/<int:profileId>/list/anime/all")
+def getAnimeList(profileId:int):
+    try:
+        return getAnimesInList.get(profileId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp
 
 # PUT
 
@@ -182,17 +220,26 @@ def update(animeId:int):
         return resp
 @app.route("/user/profile/<int:profileId>")
 def updateP(profileId:int):
-    profileData = json.loads(request.data)
-    return jsonify(updateProfile.update(profileId,profileData))
+    try:
+        profileData = json.loads(request.data)
+        return updateProfile.update(profileId,profileData)
+    except Exception as e:
+        resp = make_response({"message":"An error has occurred", "error":e.args})
+        resp.status_code = 500
+        return resp
 
 
 
 # DELETE
 
-@app.route("/user/profile/<int:profileId>/list/anime/<int:animeListId>",methods=["DELETE"])
-def removeFromList(profileId:int,animeListId:int):
-    return jsonify(removeFromL.remove(animeListId=animeListId,profileId=profileId))
-
+@app.route("/user/profile/list/<int:listId>/anime/<int:animeListId>",methods=["DELETE"])
+def removeFromList(listId:int,animeListId:int):
+    try:
+        return removeFromL.remove(animeListId=animeListId,listId=listId)
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp
 
 
 @app.route("/user/profile/<int:profileId>/delete", methods=["DELETE"])

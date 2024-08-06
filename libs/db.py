@@ -2,9 +2,9 @@ import mysql.connector
 
 db = mysql.connector.connect(
     host="localhost",
-    user="user",
-    password="password",
-    database="database"
+    user="root",
+    password="Dams400gonzalo150.",
+    database="pruebas"
 )
 dbCursor=db.cursor(buffered=True)
 
