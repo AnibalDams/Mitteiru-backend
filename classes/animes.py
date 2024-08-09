@@ -140,6 +140,17 @@ class Anime:
             return {"animes":similarAnime, "message":"Animes found"}
         except Exception as e:
             return {"message":"An error has occurred while getting the anime", "error":e.args}
+        
+    
+    def getMostPopularAnimes(self):
+        try:
+            getAnimesQuery = "SELECT * FROM Animes ORDER BY Animes.views_ DESC LIMIT 10"
+            db.dbCursor.execute(getAnimesQuery)
+            animes = db.dbCursor.fetchall()
+            return {"message":"Animes found", "animes":animes}
+        except Exception as e:
+            return {"message":"An error has occurred while getting the animes", "error":e.args}
+
                 
 
         

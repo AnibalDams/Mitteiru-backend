@@ -39,7 +39,7 @@ class List:
         removeFromListQuery ="DELETE FROM Lists WHERE anime_id=%s AND profile_id=%s" 
         db.dbCursor.execute(removeFromListQuery,[self.animeId, self.profileId])
         db.db.commit()
-        return {"message":"The anime has benn deleted from the list"}
+        return {"message":"The anime has benn deleted from the list","error":e.args}
 
     def getAll(self):
         try:
@@ -55,4 +55,4 @@ class List:
             list = db.dbCursor.fetchall()
             return {"list":list, "message":"Lists found"} 
         except Exception as e:
-             return {"message":"An error has occurred while getting the list"}
+             return {"message":"An error has occurred while getting the list","error":e.args}

@@ -4,7 +4,7 @@ from flask_cors import CORS
 from routes.PUT import  updateProfile
 from classes import users
 from routes.DELETE import deleteProfile, removeFromL
-from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime, getAnimesInList
+from routes.GET import allAnimes, getAllGenres, getAnime, getAnimesOfAnStudio, getAnimesWithTheGenre, getEpisode, getEpisodes,getProfiles,getList, getSimilarAnime, getAnimesInList, getMosPopularAnime
 from routes.POST import addToList, createAnime, login, newEpisode, newProfile, newUser, addAnimeToList
 from routes.PUT import updateAnime
 
@@ -101,6 +101,14 @@ def getSimilar(animeId:int):
         resp.status_code = 500
         return resp
 
+@app.route("/anime/mostpopular")
+def getAnimesMostPopular():
+    try:
+        return getMosPopularAnime.get()
+    except Exception as e:
+        resp = make_response(jsonify({"message":"An error has occurred","error":e.args}))
+        resp.status_code=500
+        return resp
 
 @app.route("/user/<int:userId>/profile/all")
 def allProfiles(userId:int):
