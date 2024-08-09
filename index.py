@@ -226,7 +226,7 @@ def update(animeId:int):
         resp = make_response({"message":"An error has occurred", "error":e.args})
         resp.status_code = 500
         return resp
-@app.route("/user/profile/<int:profileId>")
+@app.route("/user/profile/<int:profileId>", methods=["PUT"])
 def updateP(profileId:int):
     try:
         profileData = json.loads(request.data)
