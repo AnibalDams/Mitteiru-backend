@@ -1,27 +1,13 @@
 import {Router} from 'express'
-import {Anime} from '../classes/animes'
+import database from '../libs/db';
 
-
-import database from '../libs/db'
-
+import newAnime from './POST/newAnime';
 const route = Router()
 
 
-interface Anime_ {
-    name:string;
-    japaneseName:string;
-    synopsis:string;
-    releaseYear:string;
-    studio:string
-    cover:string;
-    image:string;
-    onGoing:number;
-    horizontalImage:string;
-    genres:string[];
-    new:Promise<{ message: string; } | undefined>
 
-}
 
+// GET
 
 route.get('/',(req,res)=>{
     // database.query(`CREATE TABLE Genres(
@@ -32,12 +18,19 @@ route.get('/',(req,res)=>{
     //     FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 
     // )`).run()
-    const anime = new Anime(0,"","","","","","","",0,"",["comedy","actions"])
-
-    anime.new()
+    // database.query(`DELETE FROM Animes`).run()
+    // database.query(`DELETE FROM Genre`).run()
+    // database.query(`DELETE FROM Genres`).run()
    
-    res.send("hola")
+   
+    res.send(`<h1 style="display:inline-block;font-family:calibri;margin-right:30pc;margin-top:50px;color:white;paddin:10px;background-color:blue;border-radius:10px;">Hello World</h1>`)
 })
 
+
+
+// POST
+
+// Animes Routes
+route.post("/anime/new", newAnime)
 
 export default route
