@@ -2,6 +2,7 @@ import {Router} from 'express'
 import database from '../libs/db';
 
 import newAnime from './POST/newAnime';
+import getAllAnimes from './GET/getAllAnimes';
 const route = Router()
 
 
@@ -27,6 +28,8 @@ route.get('/',(req,res)=>{
 })
 
 
+// Animes Rotues
+route.get('/anime/all',getAllAnimes)
 
 // POST
 

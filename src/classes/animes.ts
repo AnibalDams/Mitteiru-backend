@@ -1,8 +1,9 @@
 import database from "../libs/db";
 
-interface ReturnData{
+interface ReturnData {
   message: string;
-  error:string | null
+  animes?: any;
+  error?: string | null;
 }
 export class Anime {
   id: number;
@@ -41,33 +42,11 @@ export class Anime {
     this.horizontalImage = horizontalImage;
     this.genres = genres;
   }
-  async createTable() {
-    try {
-      let query = database.query(`CREATE TABLE Animes(
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name VARCHAR(255) NOT NULL,
-                        japanese_name VARCHAR(255) NOT NULL,
-                        synopsis TEXT NOT NULL,
-                        release_year VARCHAR(255) NOT NULL,
-                        studio VARCHAR(255) NOT NULL,
-                        cover TEXT NOT NULL,
-                        image TEXT NOT NULL,
-                        horizontal_image TEXT NOT NULL,
-                        on_going TINYINT)`);
-      query.run();
-      return { message: "The Animes table has already been created" };
-    } catch (error) {
-      console.error(error);
-      return { message: "An error has occurred" };
-    }
-  }
-
-  new():ReturnData {
-   
+  new(): ReturnData {
     const createAnimeQuery = database.query(`
             INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going)`);
     try {
-     let createAnime = createAnimeQuery.run({
+      let createAnime = createAnimeQuery.run({
         $name: this.name,
         $japanese_name: this.japaneseName,
         $synopsis: this.synopsis,
@@ -78,7 +57,7 @@ export class Anime {
         $horizontal_image: this.horizontalImage,
         $on_going: this.onGoing,
       });
-      const animeId = createAnime.lastInsertRowid
+      const animeId = createAnime.lastInsertRowid;
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
         const doesTheGenreExistQuery = database.query(
@@ -89,14 +68,36 @@ export class Anime {
           database
             .query(`INSERT INTO Genre(name) VALUES ($name)`)
             .run({ $name: genre });
-        }else{
-          database.query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`).run({ $name: genre,$anime_id: animeId });
-
+        } else {
+          database
+            .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
+            .run({ $name: genre, $anime_id: animeId });
         }
       }
-      return {message:"The anime has been created successfully",error:null}
+      return {
+        message: "The anime has been created successfully",
+        error: null,
+      };
     } catch (error: any) {
-      return { message: "An error has occurred while creating an Anime",error: error.message};
+      return {
+        message: "An error has occurred while creating an Anime",
+        error: error.message,
+      };
+    }
+  }
+
+  getAll(): ReturnData {
+    const getAllAnimeQuery = database.query(`SELECT * FROM Animes`);
+
+    try {
+      const animes = getAllAnimeQuery.all();
+
+      return { message: "animes found", animes: animes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting animes",
+        error: error.message,
+      };
     }
   }
 }
