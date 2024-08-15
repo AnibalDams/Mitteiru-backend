@@ -1,7 +1,7 @@
 # mitteiru-backend
 
 > [!NOTE]
-> Re-wirting the code using typescript and bun with sqlLite. The reason this is mainly for personal prefferences and it'd be easy for me to maintain this code in the future
+> Re-wirting the code using typescript and bun with sqlLite. The reason this is mainly for personal prefferences and it'd be easier for me to maintain this code in the future
 
 To install dependencies:
 
