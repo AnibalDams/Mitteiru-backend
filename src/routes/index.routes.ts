@@ -3,6 +3,7 @@ import database from '../libs/db';
 
 import newAnime from './POST/newAnime';
 import getAllAnimes from './GET/getAllAnimes';
+import getAnimeById from './GET/getAnimeById';
 const route = Router()
 
 
@@ -30,6 +31,7 @@ route.get('/',(req,res)=>{
 
 // Animes Rotues
 route.get('/anime/all',getAllAnimes)
+route.get('/anime/:animeId',getAnimeById)
 
 // POST
 

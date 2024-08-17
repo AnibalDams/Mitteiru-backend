@@ -100,4 +100,14 @@ export class Anime {
       };
     }
   }
+
+  getById(): ReturnData{
+    const getByAnimeByIdQuery = database.query(`SELECT * from Animes WHERE id=$id`)
+    try {
+      const anime = getByAnimeByIdQuery.get({$id:this.id});
+      return {message:"anime found", animes: anime}
+    } catch (error:any) {
+      return {message:"An error has occurred while getting the animes", error: error.message}
+    }
+  }
 }
