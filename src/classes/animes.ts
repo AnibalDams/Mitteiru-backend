@@ -4,6 +4,7 @@ interface ReturnData {
   message: string;
   animes?: any;
   error?: string | null;
+  genres?:any[]
 }
 export class Anime {
   id: number;
@@ -68,6 +69,9 @@ export class Anime {
           database
             .query(`INSERT INTO Genre(name) VALUES ($name)`)
             .run({ $name: genre });
+            database
+            .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
+            .run({ $name: genre, $anime_id: animeId });
         } else {
           database
             .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
@@ -104,8 +108,9 @@ export class Anime {
   getById(): ReturnData{
     const getByAnimeByIdQuery = database.query(`SELECT * from Animes WHERE id=$id`)
     try {
-      const anime = getByAnimeByIdQuery.get({$id:this.id});
-      return {message:"anime found", animes: anime}
+      const anime:any= getByAnimeByIdQuery.get({$id:this.id});
+      const getGenres = anime?database.query(`SELECT * FROM Genres WHERE anime_id=$animeId`).all({$animeId:anime.id}):[]
+      return {message:"anime found", animes: anime, genres: getGenres}
     } catch (error:any) {
       return {message:"An error has occurred while getting the animes", error: error.message}
     }

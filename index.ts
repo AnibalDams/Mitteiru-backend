@@ -1,5 +1,5 @@
 import express, { json,urlencoded } from "express";
-
+import path from 'path'
 
 import cors from "cors";
 import routes from './src/routes/index.routes'
@@ -23,5 +23,6 @@ app.use(routes);
 app.listen(process.env.PORT,()=>console.log('listening on port '+process.env.PORT))
 
 // Archivos estaticos
-app.use("/static", express.static(__dirname + "/static"));
+app.use("/static", express.static(path.join(__dirname + "./static")));
+
 
