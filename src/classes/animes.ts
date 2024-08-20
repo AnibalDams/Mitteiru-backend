@@ -1,11 +1,6 @@
 import database from "../libs/db";
+import type ReturnData from "../libs/types/returnData";
 
-interface ReturnData {
-  message: string;
-  animes?: any;
-  error?: string | null;
-  genres?:any[]
-}
 export class Anime {
   id: number;
   name: string;
