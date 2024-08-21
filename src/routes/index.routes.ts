@@ -9,7 +9,7 @@ import addEpisode from './POST/addEpisode';
 import getAllAnimes from './GET/getAllAnimes';
 import getAnimeById from './GET/getAnimeById';
 import getEpisodes from './GET/getEpisodes';
-
+import getMostPopularAnime from './GET/getMostPopularAnime';
 
 const route = Router()
 
@@ -44,8 +44,9 @@ route.get('/',(req,res)=>{
 
 
 // Animes Rotues
-route.get('/anime/all',getAllAnimes)
+route.get('/anime/d/all',getAllAnimes)
 route.get('/anime/:animeId',getAnimeById)
+route.get('/anime/d/mostPopular',getMostPopularAnime)
 
 
 // Episodes Routes

@@ -114,4 +114,14 @@ export class Anime {
       return {message:"An error has occurred while getting the animes", error: error.message}
     }
   }
+
+  getMostPopular():ReturnData{
+    const getMostPopularAnime = database.query(`SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`)
+    try {
+      const animes = getMostPopularAnime.all()
+      return {message:"success", animes: animes}
+    } catch (error:any) {
+      return {message:"An error has occurred while getting the animes", error: error.message}
+    }
+  }
 }
