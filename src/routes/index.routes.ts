@@ -30,6 +30,7 @@ route.get('/',(req,res)=>{
     //        FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 
     //    )`).run()
+    //database.query(`ALTER TABLE Animes ADD views_ INTEGER`).run()
     //database.query(`DROP TABLE Episodes`).run()
      //database.query(`DELETE FROM Animes`).run()
      //database.query(`DELETE FROM Episodes`).run()

@@ -40,7 +40,7 @@ export class Anime {
   }
   new(): ReturnData {
     const createAnimeQuery = database.query(`
-            INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going)`);
+            INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going,0)`);
     try {
       let createAnime = createAnimeQuery.run({
         $name: this.name,
@@ -104,6 +104,10 @@ export class Anime {
     const getByAnimeByIdQuery = database.query(`SELECT * from Animes WHERE id=$id`)
     try {
       const anime:any= getByAnimeByIdQuery.get({$id:this.id});
+      const views = anime.views_==null?0:anime.views_+1
+      if (anime != null) {
+        database.query(`UPDATE Animes SET views_=$views WHERE id=$animeId`).run({$views:views,$animeId:anime.id});
+      }
       const getGenres = anime?database.query(`SELECT * FROM Genres WHERE anime_id=$animeId`).all({$animeId:anime.id}):[]
       return {message:"anime found", animes: anime, genres: getGenres}
     } catch (error:any) {
