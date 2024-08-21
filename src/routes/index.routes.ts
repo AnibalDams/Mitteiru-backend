@@ -1,5 +1,6 @@
 import {Router} from 'express'
 import database from '../libs/db';
+import { htmlPage } from '../libs/page';
 
 import newAnime from './POST/newAnime';
 import addEpisode from './POST/addEpisode';
@@ -38,7 +39,7 @@ route.get('/',(req,res)=>{
      //database.query(`DELETE FROM Genres`).run()
    
    
-    res.send(`<h1 style="display:inline-block;font-family:calibri;margin-right:30pc;margin-top:50px;color:white;paddin:10px;background-color:blue;border-radius:10px;">Hello World</h1>`)
+    res.send(htmlPage)
 })
 
 
