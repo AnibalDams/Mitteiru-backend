@@ -57,4 +57,21 @@ export default class Episode {
       };
     }
   }
+
+  getAll():ReturnData {
+    
+    const getEpisodes = database.query(`SELECT * FROM Episodes WHERE anime_id=$animeId`)
+
+    try{
+      const doesTheAnimeExist = new Anime(this.animeId).getById();
+      if (!doesTheAnimeExist.animes) {
+        return { message: "The anime does not exist" };
+      }
+      const episodes = getEpisodes.all({$animeId: this.animeId});
+      return {message:"success",episodes:episodes}
+    
+    }catch (error:any) {
+      return{message:"An error has occurred while getting the episodes", error:error.message}
+    }
+  }
 }

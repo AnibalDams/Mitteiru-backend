@@ -1,7 +1,7 @@
 import Episode from "../../classes/episodes";
 import type { Response, Request } from "express";
 
-export default function addEpisode(req: Request, res: Response) {
+export default function addEpisode(req: Request, res: Response):void {
   try {
     const animeId = Number(req.params.animeId);
     const { name,episodeNumber, synopsis, thumbnail, link } = req.body;

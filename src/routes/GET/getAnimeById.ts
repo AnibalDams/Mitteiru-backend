@@ -3,7 +3,7 @@ import type { Response, Request } from "express";
 
 
 
-export default function getByAnimeById(req: Request, res: Response){
+export default function getByAnimeById(req: Request, res: Response):void{
     try{
         const animeId = Number(req.params.animeId)
         const anime = new Anime(animeId)

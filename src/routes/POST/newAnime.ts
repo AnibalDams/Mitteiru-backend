@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { Anime } from "../../classes/animes";
 
-export default function newAnime(req: Request, res: Response) {
+export default function newAnime(req: Request, res: Response):void {
   try {
     const {
       name,

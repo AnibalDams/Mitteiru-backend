@@ -1,7 +1,7 @@
 import { Anime } from "../../classes/animes";
 import type { Response, Request } from "express";
 
-export default function getAnimes(req: Request, res: Response) {
+export default function getAnimes(req: Request, res: Response):void {
   try {
     const getAllAnimes = new Anime().getAll();
     switch (getAllAnimes.message) {
