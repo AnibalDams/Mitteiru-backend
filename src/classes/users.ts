@@ -45,4 +45,23 @@ export default class User {
       };
     }
   }
+
+  login(): ReturnData {
+    const login = database.query(
+      `SELECT * FROM User WHERE email=$email AND password=$password`
+    );
+
+    try {
+      const user = login.get({ $email: this.email, $password: this.password });
+      if (!user) {
+        return { message: "Invalid Email/Password" };
+      }
+      return { message: "success", user: user };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the user",
+        error: error.message,
+      };
+    }
+  }
 }

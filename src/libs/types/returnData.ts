@@ -3,5 +3,6 @@ export default interface ReturnData {
     animes?: any;
     episodes?:any;
     error?: string | null;
-    genres?:any[]
+    genres?:any[];
+    user?:any
   }
