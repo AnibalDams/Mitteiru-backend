@@ -4,7 +4,7 @@ import { htmlPage } from '../libs/page';
 
 import newAnime from './POST/newAnime';
 import addEpisode from './POST/addEpisode';
-
+import signUp from './POST/signUp';
 
 import getAllAnimes from './GET/getAllAnimes';
 import getAnimeById from './GET/getAnimeById';
@@ -17,20 +17,17 @@ const route = Router()
 
 
 // GET
-
-route.get('/',(req,res)=>{
-    //    database.query(`CREATE TABLE Episodes(
-    //        id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //        name VARCHAR(255) NOT NULL,
-    //        episode_number INTEGER NOT NULL,
-    //        synopsis TEXT NOT NULL,
-    //        thumbnail TEXT NOT NULL,
-    //        link TEXT NOT NULL,
-    //        anime_id INTEGER NOT NULL,
-
     //        FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
+route.get('/',(req,res)=>{
+    //    database.query(`CREATE TABLE User(
+    //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         username VARCHAR(255) NOT NULL,
+    //         email VARCHAR(255) NOT NULL,
+    //         password TEXT NOT NULL
+         
 
-    //    )`).run()
+
+    //     )`).run()
     //database.query(`ALTER TABLE Animes ADD views_ INTEGER`).run()
     //database.query(`DROP TABLE Episodes`).run()
      //database.query(`DELETE FROM Animes`).run()
@@ -60,5 +57,9 @@ route.post("/anime/new", newAnime)
 
 // Episodes Routes
 route.post("/anime/:animeId/episode/new", addEpisode)
+
+
+// Users Routes
+route.post("/user/new",signUp)
 
 export default route
