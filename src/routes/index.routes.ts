@@ -5,6 +5,7 @@ import { htmlPage } from '../libs/page';
 import newAnime from './POST/newAnime';
 import addEpisode from './POST/addEpisode';
 import signUp from './POST/signUp';
+import login from './POST/login';
 
 import getAllAnimes from './GET/getAllAnimes';
 import getAnimeById from './GET/getAnimeById';
@@ -62,5 +63,6 @@ route.post("/anime/:animeId/episode/new", addEpisode)
 
 // Users Routes
 route.post("/user/new",signUp)
+route.post("/user/login",login)
 
 export default route
