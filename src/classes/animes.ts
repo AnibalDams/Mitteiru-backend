@@ -1,6 +1,7 @@
 import database from "../libs/db";
 import type ReturnData from "../libs/types/returnData";
-
+import getRandomInt from "../libs/randomNumber";
+import Genre from "./genres";
 export class Anime {
   id: number;
   name: string;
@@ -123,5 +124,33 @@ export class Anime {
     } catch (error:any) {
       return {message:"An error has occurred while getting the animes", error: error.message}
     }
+  }
+
+  getSimilar():ReturnData{
+    try {
+      
+      const genres:any = database.query(`SELECT * FROM Genres WHERE anime_id=$animeId`).all({$animeId:this.id})
+      if(genres.length ==0){
+        return {message:"no genres found"}
+      }
+      const randomNumber = getRandomInt(0,genres?genres.length-1:1)
+      const animes:any[] = []
+      const allAnimes = new Genre(0,genres?genres[randomNumber].name:"").getAnimes()
+
+      for (let i = 0; i < allAnimes.animes.length; i++) {
+        const anime = allAnimes.animes[i];
+
+        if (anime.id != this.id) {
+          animes.push(anime)
+        }
+        
+      }
+      return {message:"success", animes: animes}
+
+      
+    } catch (error:any) {
+      return {message:"An error has occurred while getting the similar Animes", error: error.message}
+    }
+
   }
 }

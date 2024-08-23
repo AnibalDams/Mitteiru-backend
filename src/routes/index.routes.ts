@@ -11,6 +11,7 @@ import getAllAnimes from './GET/getAllAnimes';
 import getAnimeById from './GET/getAnimeById';
 import getEpisodes from './GET/getEpisodes';
 import getMostPopularAnime from './GET/getMostPopularAnime';
+import getSimilarAnimes from './GET/getSimilarAnime';
 
 const route = Router()
 
@@ -46,6 +47,7 @@ route.get('/',(req,res)=>{
 route.get('/anime/d/all',getAllAnimes)
 route.get('/anime/:animeId',getAnimeById)
 route.get('/anime/d/mostPopular',getMostPopularAnime)
+route.get('/anime/:animeId/similar',getSimilarAnimes)
 
 
 // Episodes Routes
