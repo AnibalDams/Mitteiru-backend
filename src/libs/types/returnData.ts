@@ -5,4 +5,5 @@ export default interface ReturnData {
     error?: string | null;
     genres?:any[];
     user?:any
+    profiles?:any
   }

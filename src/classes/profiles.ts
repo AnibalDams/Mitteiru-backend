@@ -44,4 +44,23 @@ export default class Profile {
       };
     }
   }
+
+  getAll(): ReturnData {
+    const getAllProfiles = database.query(
+      `SELECT * FROM Profiles WHERE user_id = $userId`
+    );
+    try {
+      const verifyUser = database.query(`SELECT id FROM User WHERE id = $userId`).get({ $userId: this.userId });
+      if (!verifyUser) {
+        return { message: "User not found" };
+      }
+      const allProfiles = getAllProfiles.all({ $userId: this.userId });
+      return { message: "success", profiles: allProfiles };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting all profiles",
+        error: error.message,
+      };
+    }
+  }
 }

@@ -13,6 +13,7 @@ import getAnimeById from "./GET/getAnimeById";
 import getEpisodes from "./GET/getEpisodes";
 import getMostPopularAnime from "./GET/getMostPopularAnime";
 import getSimilarAnimes from "./GET/getSimilarAnime";
+import getAllProfiles from "./GET/getAllProfiles";
 
 const route = Router();
 
@@ -48,6 +49,9 @@ route.get("/anime/:animeId/similar", getSimilarAnimes);
 
 // Episodes Routes
 route.get("/anime/:animeId/episode/all", getEpisodes);
+
+// Profiles Routes
+route.get("/user/:userId/profile/d/all", getAllProfiles);
 
 // POST
 
