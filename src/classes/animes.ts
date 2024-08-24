@@ -76,7 +76,7 @@ export class Anime {
       }
       return {
         message: "The anime has been created successfully",
-        error: null,
+
       };
     } catch (error: any) {
       return {
@@ -87,7 +87,7 @@ export class Anime {
   }
 
   getAll(): ReturnData {
-    const getAllAnimeQuery = database.query(`SELECT * FROM Animes`);
+    const getAllAnimeQuery = database.query(`SELECT * FROM Animes ORDER BY Animes.id DESC`);
 
     try {
       const animes = getAllAnimeQuery.all();
