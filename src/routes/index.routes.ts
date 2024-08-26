@@ -7,6 +7,7 @@ import addEpisode from "./POST/addEpisode";
 import signUp from "./POST/signUp";
 import login from "./POST/login";
 import newProfile from "./POST/newProfile";
+import newList from "./POST/newList";
 
 import getAllAnimes from "./GET/getAllAnimes";
 import getAnimeById from "./GET/getAnimeById";
@@ -14,21 +15,21 @@ import getEpisodes from "./GET/getEpisodes";
 import getMostPopularAnime from "./GET/getMostPopularAnime";
 import getSimilarAnimes from "./GET/getSimilarAnime";
 import getAllProfiles from "./GET/getAllProfiles";
+import getLists from "./GET/getList";
 
 const route = Router();
 
 // GET
 //        FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 route.get("/", (req, res) => {
-  // database.query(`CREATE TABLE Profiles(
-  //      id INTEGER PRIMARY KEY AUTOINCREMENT,
-  //      name TEXT NOT NULL,
-  //      photo TEXT NOT NULL,
-  //      user_id INTEGER NOT NULL,
+  //  database.query(`CREATE TABLE Lists(
+  //       id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //       name TEXT NOT NULL,
+  //       profile_id INTEGER NOT NULL,
 
-  //     FOREIGN KEY(user_id) REFERENCES User(id) ON DELETE CASCADE
+  //      FOREIGN KEY(profile_id) REFERENCES User(id) ON DELETE CASCADE
 
-  //  )`).run()
+  //   )`).run()
   //database.query(`ALTER TABLE Animes ADD views_ INTEGER`).run()
   //database.query(`DROP TABLE Episodes`).run()
   //database.query(`DELETE FROM Animes`).run()
@@ -53,6 +54,9 @@ route.get("/anime/:animeId/episode/all", getEpisodes);
 // Profiles Routes
 route.get("/user/:userId/profile/d/all", getAllProfiles);
 
+// Lists Routes
+route.get("/user/profile/:profileId/list/all", getLists);
+
 // POST
 
 // Animes Routes
@@ -67,5 +71,8 @@ route.post("/user/login", login);
 
 // profiles Routes
 route.post("/user/:userId/profile/d/new", newProfile);
+
+// Lists Routes
+route.post("/user/profile/:profileId/list/new", newList);
 
 export default route;

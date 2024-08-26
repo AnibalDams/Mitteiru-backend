@@ -1,3 +1,10 @@
+interface List{
+  id: number
+  name: string
+  profileId:number
+}
+
+
 export default interface ReturnData {
     message: string;
     animes?: any;
@@ -6,4 +13,5 @@ export default interface ReturnData {
     genres?:any[];
     user?:any
     profiles?:any
+    lists?:List[]|unknown[]
   }
