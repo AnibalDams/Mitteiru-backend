@@ -1,6 +1,6 @@
 import database from "../libs/db";
 import type ReturnData from "../libs/types/returnData";
-
+import List from "./lists";
 export default class Profile {
   id: number;
   name: string;
@@ -30,12 +30,13 @@ export default class Profile {
       if (!verifyUser) {
         return { message: "User not found" };
       }
-      newProfile.run({
+      const profile:any = newProfile.run({
         $name: this.name,
         $photo: this.photo,
         $userId: this.userId,
       });
-
+      const list = new List(0,"Default",profile.lastInsertRowid)
+      list.new()
       return { message: "success" };
     } catch (error: any) {
       return {

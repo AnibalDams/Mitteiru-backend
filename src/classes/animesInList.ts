@@ -45,7 +45,7 @@ export default class AnimeInList {
     );
     try {
       const allLists = database
-        .query(`SELECT id, name FROM List WHERE profile_id=$profileId`)
+        .query(`SELECT id, name FROM Lists WHERE profile_id=$profileId`)
         .all({ $profileId: this.profileId });
       for (let i = 0; i < allLists.length; i++) {
         const list: any = allLists[i];

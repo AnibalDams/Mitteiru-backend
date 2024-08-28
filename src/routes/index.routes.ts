@@ -17,6 +17,9 @@ import getMostPopularAnime from "./GET/getMostPopularAnime";
 import getSimilarAnimes from "./GET/getSimilarAnime";
 import getAllProfiles from "./GET/getAllProfiles";
 import getLists from "./GET/getList";
+import getAnimesInList from "./GET/getAnimesInList";
+
+import removeAnimeFromList from "./DELETE/removeFromList";
 
 const route = Router();
 
@@ -58,6 +61,7 @@ route.get("/user/:userId/profile/d/all", getAllProfiles);
 
 // Lists Routes
 route.get("/user/profile/:profileId/list/all", getLists);
+route.get("/user/profile/:profileId/list/anime/all", getAnimesInList);
 
 // POST
 
@@ -76,6 +80,11 @@ route.post("/user/:userId/profile/d/new", newProfile);
 
 // Lists Routes
 route.post("/user/profile/:profileId/list/new", newList);
-route.post("/anime/:animeId/list/:listId", addAnimeToList);
+route.post("/anime/:animeId/list/:listId/add", addAnimeToList);
+
+// DELETE
+
+// Lists Routes
+route.delete("/user/profile/list/:listId/anime/:animeId", removeAnimeFromList);
 
 export default route;
