@@ -64,4 +64,22 @@ export default class Profile {
       };
     }
   }
+
+  delete():ReturnData{
+    try {
+      database.query(`DELETE FROM Profiles WHERE id=$profileId`).run({$profileId: this.id})
+      return {message: "success"}
+    } catch (error:any) {
+      return {message: "An error has occurred while deleting the profile", error: error.message}
+    }
+  }
+
+  update():ReturnData{
+    try {
+      database.query(`UPDATE Profiles SET name=$name,photo=$profilePhoto WHERE id=$profileId`).run({$profileId:this.id,$profilePhoto:this.photo, $name:this.name})
+      return {message:"success"}
+    } catch (error:any) {
+      return {message: "An error has occurred while updating the profile", error: error.message}
+    }
+  }
 }

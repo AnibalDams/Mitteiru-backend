@@ -20,6 +20,9 @@ import getLists from "./GET/getList";
 import getAnimesInList from "./GET/getAnimesInList";
 
 import removeAnimeFromList from "./DELETE/removeFromList";
+import deleteProfile from "./DELETE/deleteProfile"
+
+import updateProfile from "./PUT/updateProfile";
 
 const route = Router();
 
@@ -84,7 +87,18 @@ route.post("/anime/:animeId/list/:listId/add", addAnimeToList);
 
 // DELETE
 
+// Profiles Routes
+route.delete("/user/profile/:profileId/delete", deleteProfile);
+
 // Lists Routes
 route.delete("/user/profile/list/:listId/anime/:animeId", removeAnimeFromList);
+
+
+// PUT routes
+
+// Profiles Routes
+route.put("/user/profile/:profileId",updateProfile)
+
+
 
 export default route;
