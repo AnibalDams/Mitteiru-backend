@@ -23,7 +23,7 @@ export default class Profile {
     const newProfile = database.query(
       `INSERT INTO Profiles(name, photo, user_id) VALUES($name,$photo,$userId)`
     );
-    const defaultLists = ["watching", "Completed", "Planning", "Paused", "Dropped"]
+    const defaultLists = ["Watching", "Completed", "Planning", "Paused", "Dropped"]
     try {
       const verifyUser = database
         .query(`SELECT id FROM User WHERE id = $userId`)
