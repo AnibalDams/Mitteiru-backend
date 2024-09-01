@@ -23,6 +23,7 @@ export default class Profile {
     const newProfile = database.query(
       `INSERT INTO Profiles(name, photo, user_id) VALUES($name,$photo,$userId)`
     );
+    const defaultLists = ["watching", "Completed", "Planning", "Paused", "Dropped"]
     try {
       const verifyUser = database
         .query(`SELECT id FROM User WHERE id = $userId`)
@@ -35,8 +36,12 @@ export default class Profile {
         $photo: this.photo,
         $userId: this.userId,
       });
-      const list = new List(0,"Default",profile.lastInsertRowid)
-      list.new()
+      for (let i = 0; i < defaultLists.length; i++) {
+        const listName = defaultLists[i];
+        const list = new List(0,listName,profile.lastInsertRowid)
+        list.new()        
+      }
+
       return { message: "success" };
     } catch (error: any) {
       return {
