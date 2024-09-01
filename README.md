@@ -5,7 +5,7 @@
 
 
 > [!NOTE]
-> The file "db.sqlite has all the necessary tables to make the database and API to work"
+> The file "db.sqlite" has all the necessary tables to make the database and API to work
 
 To install dependencies:
 
