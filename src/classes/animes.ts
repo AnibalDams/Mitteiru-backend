@@ -65,7 +65,7 @@ export class Anime {
           database
             .query(`INSERT INTO Genre(name) VALUES ($name)`)
             .run({ $name: genre });
-            database
+          database
             .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
             .run({ $name: genre, $anime_id: animeId });
         } else {
@@ -76,7 +76,6 @@ export class Anime {
       }
       return {
         message: "The anime has been created successfully",
-
       };
     } catch (error: any) {
       return {
@@ -87,7 +86,9 @@ export class Anime {
   }
 
   getAll(): ReturnData {
-    const getAllAnimeQuery = database.query(`SELECT * FROM Animes ORDER BY Animes.id DESC`);
+    const getAllAnimeQuery = database.query(
+      `SELECT * FROM Animes ORDER BY Animes.id DESC`
+    );
 
     try {
       const animes = getAllAnimeQuery.all();
@@ -101,56 +102,89 @@ export class Anime {
     }
   }
 
-  getById(): ReturnData{
-    const getByAnimeByIdQuery = database.query(`SELECT * from Animes WHERE id=$id`)
+  getById(): ReturnData {
+    const getByAnimeByIdQuery = database.query(
+      `SELECT * from Animes WHERE id=$id`
+    );
     try {
-      const anime:any= getByAnimeByIdQuery.get({$id:this.id});
-      const views = anime.views_==null?0:anime.views_+1
+      const anime: any = getByAnimeByIdQuery.get({ $id: this.id });
+      const views = anime.views_ == null ? 0 : anime.views_ + 1;
       if (anime != null) {
-        database.query(`UPDATE Animes SET views_=$views WHERE id=$animeId`).run({$views:views,$animeId:anime.id});
+        database
+          .query(`UPDATE Animes SET views_=$views WHERE id=$animeId`)
+          .run({ $views: views, $animeId: anime.id });
       }
-      const getGenres = anime?database.query(`SELECT * FROM Genres WHERE anime_id=$animeId`).all({$animeId:anime.id}):[]
-      return {message:"anime found", animes: anime, genres: getGenres}
-    } catch (error:any) {
-      return {message:"An error has occurred while getting the animes", error: error.message}
+      const getGenres = anime
+        ? database
+            .query(`SELECT * FROM Genres WHERE anime_id=$animeId`)
+            .all({ $animeId: anime.id })
+        : [];
+      return { message: "anime found", animes: anime, genres: getGenres };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the animes",
+        error: error.message,
+      };
+    }
+  }
+  getAnimesOfAnStudio(): ReturnData {
+    try {
+      const animes = database
+        .query(`SELECT * FROM Animes WHERE studio=$studio`)
+        .all({$studio:this.studio});
+      return { message: "success", animes: animes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the animes",
+        error: error.message,
+      };
+    }
+  }
+  getMostPopular(): ReturnData {
+    const getMostPopularAnime = database.query(
+      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`
+    );
+    try {
+      const animes = getMostPopularAnime.all();
+      return { message: "success", animes: animes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the animes",
+        error: error.message,
+      };
     }
   }
 
-  getMostPopular():ReturnData{
-    const getMostPopularAnime = database.query(`SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`)
+  getSimilar(): ReturnData {
     try {
-      const animes = getMostPopularAnime.all()
-      return {message:"success", animes: animes}
-    } catch (error:any) {
-      return {message:"An error has occurred while getting the animes", error: error.message}
-    }
-  }
-
-  getSimilar():ReturnData{
-    try {
-      
-      const genres:any = database.query(`SELECT * FROM Genres WHERE anime_id=$animeId`).all({$animeId:this.id})
-      if(genres.length ==0){
-        return {message:"no genres found"}
+      const genres: any = database
+        .query(`SELECT * FROM Genres WHERE anime_id=$animeId`)
+        .all({ $animeId: this.id });
+      if (genres.length == 0) {
+        return { message: "no genres found" };
       }
-      const randomNumber = getRandomInt(0,genres?genres.length-1:1)
-      const animes:any[] = []
-      const allAnimes = new Genre(0,genres?genres[randomNumber].name:"").getAnimes()
+      const randomNumber = getRandomInt(0, genres ? genres.length - 1 : 1);
+      const animes: any[] = [];
+      const allAnimes = new Genre(
+        0,
+        genres ? genres[randomNumber].name : ""
+      ).getAnimes();
 
       for (let i = 0; i < allAnimes.animes.length; i++) {
         const anime = allAnimes.animes[i];
 
         if (anime.id != this.id) {
-          animes.push(anime)
+          animes.push(anime);
         }
-        
       }
-      return {message:"success", animes: animes}
-
-      
-    } catch (error:any) {
-      return {message:"An error has occurred while getting the similar Animes", error: error.message}
+      return { message: "success", animes: animes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the similar Animes",
+        error: error.message,
+      };
     }
-
   }
+
+ 
 }
