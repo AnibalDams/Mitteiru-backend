@@ -21,6 +21,7 @@ import getAnimesInList from "./GET/getAnimesInList";
 import getAnimesOfAGenre from "./GET/getAnimesOfAGenre";
 import getAllGenres from "./GET/getAllGenres";
 import getAnimesOfAnStudio from "./GET/getAnimesOfAnStudio";
+import getAnimeOfAyear from "./GET/getAnimesOfAYear";
 
 import removeAnimeFromList from "./DELETE/removeFromList";
 import deleteProfile from "./DELETE/deleteProfile"
@@ -61,6 +62,7 @@ route.get("/anime/:animeId/similar", getSimilarAnimes);
 route.get("/anime/genre/:genre", getAnimesOfAGenre)
 route.get("/anime/genre/d/all", getAllGenres)
 route.get("/anime/d/studio/:studio",getAnimesOfAnStudio)
+route.get("/anime/d/year/:year",getAnimeOfAyear)
 
 // Episodes Routes
 route.get("/anime/:animeId/episode/all", getEpisodes);

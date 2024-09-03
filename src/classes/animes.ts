@@ -185,6 +185,14 @@ export class Anime {
       };
     }
   }
+  getAnimesOfAYear():ReturnData{
+    try {
+      const animes = database.query(`SELECT * FROM Animes WHERE release_year=$releaseYear`).all({$releaseYear:this.releaseYear})
+      return {message:"Success", animes: animes}
+    } catch (error:any) {
+      return {message: "An error has occurred while getting the animes", error: error.message}
+    }
+  }
 
  
 }
