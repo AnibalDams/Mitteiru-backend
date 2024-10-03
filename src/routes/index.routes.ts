@@ -10,6 +10,7 @@ import newProfile from "./POST/newProfile";
 import newList from "./POST/newList";
 import addAnimeToList from "./POST/addToListAnime";
 import addToHistory from "./POST/addToHistory";
+import addLikeToAnime from "./POST/addLike";
 
 import getAllAnimes from "./GET/getAllAnimes";
 import getAnimeById from "./GET/getAnimeById";
@@ -24,6 +25,7 @@ import getAllGenres from "./GET/getAllGenres";
 import getAnimesOfAnStudio from "./GET/getAnimesOfAnStudio";
 import getAnimeOfAyear from "./GET/getAnimesOfAYear";
 import getHistory from "./GET/getHistory";
+import getLikes from "./GET/getrLikes";
 
 import removeAnimeFromList from "./DELETE/removeFromList";
 import deleteProfile from "./DELETE/deleteProfile"
@@ -35,15 +37,16 @@ const route = Router();
 // GET
 //        FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 route.get("/", (req, res) => {
-    // database.query(`CREATE TABLE History(
-    //       id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //       anime_id INTEGER NOT NULL,
-    //       episode_number INTEGER NOT NULL,
+    //  database.query(`CREATE TABLE Likes(
+    //        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //        anime_id INTEGER NOT NULL,
+    //        profile_id INTEGER NOT NULL,
           
 
-    //      FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
+    //       FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
+    //       FOREIGN KEY(profile_id) REFERENCES Profiles(id) ON DELETE CASCADE
 
-    //   )`).run()
+    //    )`).run()
   //database.query(`ALTER TABLE History ADD profile_id INTEGER`).run()
   //database.query(`DROP TABLE Episodes`).run()
   //database.query(`DELETE FROM Animes`).run()
@@ -66,6 +69,7 @@ route.get("/anime/genre/:genre", getAnimesOfAGenre)
 route.get("/anime/genre/d/all", getAllGenres)
 route.get("/anime/d/studio/:studio",getAnimesOfAnStudio)
 route.get("/anime/d/year/:year",getAnimeOfAyear)
+route.get("/anime/:animeId/likes/count",getLikes)
 
 // Episodes Routes
 route.get("/anime/:animeId/episode/all", getEpisodes);
@@ -84,6 +88,7 @@ route.get("/user/profile/:profileId/list/anime/all", getAnimesInList);
 
 // Animes Routes
 route.post("/anime/new", newAnime);
+route.post("/anime/:animeId/like/:profileId", addLikeToAnime);
 
 // Episodes Routes
 route.post("/anime/:animeId/episode/new", addEpisode);

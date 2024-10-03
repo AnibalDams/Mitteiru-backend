@@ -193,6 +193,34 @@ export class Anime {
       return {message: "An error has occurred while getting the animes", error: error.message}
     }
   }
+  addLike(profileId:number):ReturnData{
+    try {
+      console.log("Function started")
+      console.log("Verifying like")
+      const verifyLike = database.query(`SELECT * FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`).get({$profileId:profileId, $animeId:this.id})
+      console.log("Done")
+      if(verifyLike){
+        console.log("There is a like, deleting it")
+        database.query(`DELETE FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`).run({$profileId:profileId, $animeId:this.id})
+        console.log("Done")
+        return {message:"success 1"}
+      }
+      console.log("There is no like, adding")
+      database.query(`INSERT INTO Likes(anime_id, profile_id) VALUES($animeId,$profileId)`).run({$animeId:this.id,$profileId:profileId})
+      console.log("done")
+      return {message:"success 2"}  
+    } catch (error:any) {
+      return {message: "An error has occurred while adding the like", error: error.message}
+    }
+  }
+  getLikes():ReturnData { 
+    try {
+      const likes = database.query("SELECT profile_id FROM Likes WHERE anime_id=$animeId").all({$animeId:this.id})
+      return {message:"Success", likesCount:likes.length, profiles:likes}
+    } catch (error:any) {
+      return {message:"An error has occurred", error: error.message}
+    }
+  }
 
  
 }

@@ -14,4 +14,5 @@ export default interface ReturnData {
     user?:any
     profiles?:any
     lists?:List[]|unknown[]
+    likesCount?:Number
   }
