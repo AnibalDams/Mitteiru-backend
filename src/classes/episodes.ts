@@ -40,6 +40,18 @@ export default class Episode {
       if (!doesTheAnimeExist.animes) {
         return { message: "The anime does not exist" };
       } else {
+        const verifyEpisode = database.query(`SELECT id FROM Episodes WHERE episode_number=$episodeNumber AND anime_id=$animeId`).get({$episodeNumber:this.episodeNumber,$animeId:this.animeId})
+        if (verifyEpisode) {
+          database.query(`UPDATE Episodes SET name=$name,episode_number=$episodeNumber,synopsis=$synopsis,thumbnail=$thumbnail,link=$link WHERE episode_number=$episodeNumber AND anime_id=$animeId`).run({
+            $name: this.name,
+            $episodeNumber: this.episodeNumber,
+            $synopsis: this.synopsis,
+            $thumbnail: this.thumbnail,
+            $link: this.link,
+          });
+          console.log("episode updated")
+          return { message: "The episode was added to the anime"}
+        }
         newEpisodeQuery.run({
           $name: this.name,
           $episodeNumber: this.episodeNumber,
@@ -48,6 +60,7 @@ export default class Episode {
           $link: this.link,
           $animeId: this.animeId,
         });
+
         return { message: "The episode was added to the anime" };
       }
     } catch (error: any) {

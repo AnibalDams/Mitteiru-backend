@@ -43,6 +43,24 @@ export class Anime {
     const createAnimeQuery = database.query(`
             INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going,0)`);
     try {
+      const verifyAnime = database.query(`SELECT id FROM Animes WHERE name=$name`).get({$name:this.name})
+      if (verifyAnime) {
+        database.query(`UPDATE Animes SET name=$name,japanese_name=$japanese_name,synopsis=$synopsis,release_year=$release_year,studio=$studio,cover=$cover,image=$image,horizontal_image=$horizontal_image,on_going=$on_going WHERE name=$name`).run({
+          $name: this.name,
+          $japanese_name: this.japaneseName,
+          $synopsis: this.synopsis,
+          $release_year: this.releaseYear,
+          $studio: this.studio,
+          $cover: this.cover,
+          $image: this.image,
+          $horizontal_image: this.horizontalImage,
+          $on_going: this.onGoing,
+        })
+        console.log("anime updated")
+        return {
+          message: "The anime has been created successfully",
+        };
+      }
       let createAnime = createAnimeQuery.run({
         $name: this.name,
         $japanese_name: this.japaneseName,
