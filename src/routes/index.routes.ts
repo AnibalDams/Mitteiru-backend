@@ -37,16 +37,15 @@ const route = Router();
 // GET
 //        FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 route.get("/", (req, res) => {
-    //  database.query(`CREATE TABLE Likes(
-    //        id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //        anime_id INTEGER NOT NULL,
-    //        profile_id INTEGER NOT NULL,
+      // database.query(`CREATE TABLE animes_likes(
+      //       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      //       anime_id INTEGER NOT NULL,
+      //       likes INTEGER NOT NULL,
           
 
-    //       FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
-    //       FOREIGN KEY(profile_id) REFERENCES Profiles(id) ON DELETE CASCADE
+      //      FOREIGN KEY(anime_id) REFERENCES Animes(id) ON DELETE CASCADE
 
-    //    )`).run()
+      //   )`).run()
   //database.query(`ALTER TABLE History ADD profile_id INTEGER`).run()
   //database.query(`DROP TABLE Episodes`).run()
   //database.query(`DELETE FROM Animes`).run()
@@ -59,6 +58,7 @@ route.get("/", (req, res) => {
 
   res.send(htmlPage);
 });
+
 
 // Animes Rotues
 route.get("/anime/d/all", getAllAnimes);
