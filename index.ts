@@ -18,7 +18,17 @@ app.use(json());
 
 app.use(routes);
 
-
+app.get('/download', (req, res) => {
+    const file = path.join(__dirname, 'db.sqlite'); // Cambia 'ruta/al/archivo.txt' por la ruta de tu archivo
+    console.log(__dirname)
+    res.download(file, (err) => {
+        if (err) {
+            console.error('Error al descargar el archivo:', err);
+            res.status(500).send('Error al descargar el archivo');
+        }
+    });
+  });
+  
 
 app.listen(process.env.PORT,()=>console.log('listening on port '+process.env.PORT))
 

@@ -21,7 +21,7 @@ export default function addEpisode(req: Request, res: Response):void {
         res.json(newEpisode);
         break;
       case "The episode was added to the anime":
-        res.statusCode = 200;
+        res.statusCode = 201;
         res.json(newEpisode);
         break;
       case "An error has occurred while adding the episode":

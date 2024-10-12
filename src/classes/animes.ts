@@ -43,20 +43,26 @@ export class Anime {
     const createAnimeQuery = database.query(`
             INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going,0)`);
     try {
-      const verifyAnime = database.query(`SELECT id FROM Animes WHERE name=$name`).get({$name:this.name})
+      const verifyAnime = database
+        .query(`SELECT id FROM Animes WHERE name=$name`)
+        .get({ $name: this.name });
       if (verifyAnime) {
-        database.query(`UPDATE Animes SET name=$name,japanese_name=$japanese_name,synopsis=$synopsis,release_year=$release_year,studio=$studio,cover=$cover,image=$image,horizontal_image=$horizontal_image,on_going=$on_going WHERE name=$name`).run({
-          $name: this.name,
-          $japanese_name: this.japaneseName,
-          $synopsis: this.synopsis,
-          $release_year: this.releaseYear,
-          $studio: this.studio,
-          $cover: this.cover,
-          $image: this.image,
-          $horizontal_image: this.horizontalImage,
-          $on_going: this.onGoing,
-        })
-        console.log("anime updated")
+        database
+          .query(
+            `UPDATE Animes SET name=$name,japanese_name=$japanese_name,synopsis=$synopsis,release_year=$release_year,studio=$studio,cover=$cover,image=$image,horizontal_image=$horizontal_image,on_going=$on_going WHERE name=$name`
+          )
+          .run({
+            $name: this.name,
+            $japanese_name: this.japaneseName,
+            $synopsis: this.synopsis,
+            $release_year: this.releaseYear,
+            $studio: this.studio,
+            $cover: this.cover,
+            $image: this.image,
+            $horizontal_image: this.horizontalImage,
+            $on_going: this.onGoing,
+          });
+        console.log("anime updated");
         return {
           message: "The anime has been created successfully",
         };
@@ -73,6 +79,12 @@ export class Anime {
         $on_going: this.onGoing,
       });
       const animeId = createAnime.lastInsertRowid;
+      database
+        .query(
+          `INSERT INTO animes_likes(anime_id, likes) VALUES($animeId, $likes)`
+        )
+        .run({ $animeId: animeId, $likes: 0 });
+
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
         const doesTheGenreExistQuery = database.query(
@@ -149,7 +161,7 @@ export class Anime {
     try {
       const animes = database
         .query(`SELECT * FROM Animes WHERE studio=$studio`)
-        .all({$studio:this.studio});
+        .all({ $studio: this.studio });
       return { message: "success", animes: animes };
     } catch (error: any) {
       return {
@@ -203,42 +215,99 @@ export class Anime {
       };
     }
   }
-  getAnimesOfAYear():ReturnData{
+  getAnimesOfAYear(): ReturnData {
     try {
-      const animes = database.query(`SELECT * FROM Animes WHERE release_year=$releaseYear`).all({$releaseYear:this.releaseYear})
-      return {message:"Success", animes: animes}
-    } catch (error:any) {
-      return {message: "An error has occurred while getting the animes", error: error.message}
+      const animes = database
+        .query(`SELECT * FROM Animes WHERE release_year=$releaseYear`)
+        .all({ $releaseYear: this.releaseYear });
+      return { message: "Success", animes: animes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the animes",
+        error: error.message,
+      };
     }
   }
-  addLike(profileId:number):ReturnData{
+  addLike(profileId: number): ReturnData {
     try {
-      console.log("Function started")
-      console.log("Verifying like")
-      const verifyLike = database.query(`SELECT * FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`).get({$profileId:profileId, $animeId:this.id})
-      console.log("Done")
-      if(verifyLike){
-        console.log("There is a like, deleting it")
-        database.query(`DELETE FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`).run({$profileId:profileId, $animeId:this.id})
-        console.log("Done")
-        return {message:"success 1"}
+      console.log("Function started");
+      console.log("Verifying like");
+      const verifyLike = database
+        .query(
+          `SELECT * FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`
+        )
+        .get({ $profileId: profileId, $animeId: this.id });
+      const getTotalLikes: any = database
+        .query(`SELECT likes from animes_likes WHERE anime_id=$animeId`)
+        .get({ $animeId: this.id });
+      console.log(getTotalLikes);
+      console.log("Done");
+      if (verifyLike) {
+        console.log("There is a like, deleting it");
+        database
+          .query(
+            `DELETE FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`
+          )
+          .run({ $profileId: profileId, $animeId: this.id });
+        database
+          .query(
+            `UPDATE animes_likes SET likes=$totalLikes WHERE anime_id=$animeId`
+          )
+          .run({ $totalLikes: getTotalLikes.likes - 1, $animeId: this.id });
+        console.log("Done");
+        return { message: "success 1" };
       }
-      console.log("There is no like, adding")
-      database.query(`INSERT INTO Likes(anime_id, profile_id) VALUES($animeId,$profileId)`).run({$animeId:this.id,$profileId:profileId})
-      console.log("done")
-      return {message:"success 2"}  
-    } catch (error:any) {
-      return {message: "An error has occurred while adding the like", error: error.message}
+      console.log("There is no like, adding");
+      database
+        .query(
+          `INSERT INTO Likes(anime_id, profile_id) VALUES($animeId,$profileId)`
+        )
+        .run({ $animeId: this.id, $profileId: profileId });
+      database
+        .query(
+          `UPDATE animes_likes SET likes=$totalLikes WHERE anime_id=$animeId`
+        )
+        .run({ $totalLikes: getTotalLikes.likes + 1, $animeId: this.id });
+      console.log("done");
+      return { message: "success 2" };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while adding the like",
+        error: error.message,
+      };
     }
   }
-  getLikes():ReturnData { 
+  getLikes(): ReturnData {
     try {
-      const likes = database.query("SELECT profile_id FROM Likes WHERE anime_id=$animeId").all({$animeId:this.id})
-      return {message:"Success", likesCount:likes.length, profiles:likes}
-    } catch (error:any) {
-      return {message:"An error has occurred", error: error.message}
+      const likes = database
+        .query("SELECT profile_id FROM Likes WHERE anime_id=$animeId")
+        .all({ $animeId: this.id });
+      return { message: "Success", likesCount: likes.length, profiles: likes };
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message };
     }
   }
+  getMostLiked(): ReturnData {
+    try {
+      // Consulta para obtener los animes con el número de likes de mayor a menor
+      const mostLikedAnimesQuery = database.query(`
+        SELECT Animes.*, COUNT(Likes.anime_id) AS like_count
+        FROM Animes
+        LEFT JOIN Likes ON Animes.id = Likes.anime_id
+        GROUP BY Animes.id
+        ORDER BY like_count DESC
+        LIMIT 10; 
+      `);
 
- 
+      const mostLikedAnimes = mostLikedAnimesQuery.all();
+
+      // Retornamos los animes junto con el conteo de likes
+      return { message: "success", animes: mostLikedAnimes };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while getting the most liked animes",
+        error: error.message,
+      };
+    }
+  }
 }

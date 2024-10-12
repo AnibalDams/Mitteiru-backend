@@ -1,5 +1,4 @@
 import { Router } from "express";
-import database from "../libs/db";
 import { htmlPage } from "../libs/page";
 
 import newAnime from "./POST/newAnime";
@@ -26,6 +25,7 @@ import getAnimesOfAnStudio from "./GET/getAnimesOfAnStudio";
 import getAnimeOfAyear from "./GET/getAnimesOfAYear";
 import getHistory from "./GET/getHistory";
 import getLikes from "./GET/getrLikes";
+import getAnimesWithMostLikes from "./GET/getAnimesWithMostLikes";
 
 import removeAnimeFromList from "./DELETE/removeFromList";
 import deleteProfile from "./DELETE/deleteProfile"
@@ -60,16 +60,21 @@ route.get("/", (req, res) => {
 });
 
 
+
+
+
 // Animes Rotues
-route.get("/anime/d/all", getAllAnimes);
 route.get("/anime/:animeId", getAnimeById);
+route.get("/anime/d/all", getAllAnimes);
 route.get("/anime/d/mostPopular", getMostPopularAnime);
-route.get("/anime/:animeId/similar", getSimilarAnimes);
-route.get("/anime/genre/:genre", getAnimesOfAGenre)
-route.get("/anime/genre/d/all", getAllGenres)
 route.get("/anime/d/studio/:studio",getAnimesOfAnStudio)
 route.get("/anime/d/year/:year",getAnimeOfAyear)
+route.get("/anime/d/mostLiked",getAnimesWithMostLikes)
+route.get("/anime/:animeId/similar", getSimilarAnimes);
 route.get("/anime/:animeId/likes/count",getLikes)
+route.get("/anime/genre/:genre", getAnimesOfAGenre)
+route.get("/anime/genre/d/all", getAllGenres)
+
 
 // Episodes Routes
 route.get("/anime/:animeId/episode/all", getEpisodes);
