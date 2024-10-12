@@ -79,11 +79,7 @@ export class Anime {
         $on_going: this.onGoing,
       });
       const animeId = createAnime.lastInsertRowid;
-      database
-        .query(
-          `INSERT INTO animes_likes(anime_id, likes) VALUES($animeId, $likes)`
-        )
-        .run({ $animeId: animeId, $likes: 0 });
+
 
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
@@ -240,7 +236,6 @@ export class Anime {
       const getTotalLikes: any = database
         .query(`SELECT likes from animes_likes WHERE anime_id=$animeId`)
         .get({ $animeId: this.id });
-      console.log(getTotalLikes);
       console.log("Done");
       if (verifyLike) {
         console.log("There is a like, deleting it");
@@ -249,12 +244,7 @@ export class Anime {
             `DELETE FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`
           )
           .run({ $profileId: profileId, $animeId: this.id });
-        database
-          .query(
-            `UPDATE animes_likes SET likes=$totalLikes WHERE anime_id=$animeId`
-          )
-          .run({ $totalLikes: getTotalLikes.likes - 1, $animeId: this.id });
-        console.log("Done");
+
         return { message: "success 1" };
       }
       console.log("There is no like, adding");
@@ -263,11 +253,7 @@ export class Anime {
           `INSERT INTO Likes(anime_id, profile_id) VALUES($animeId,$profileId)`
         )
         .run({ $animeId: this.id, $profileId: profileId });
-      database
-        .query(
-          `UPDATE animes_likes SET likes=$totalLikes WHERE anime_id=$animeId`
-        )
-        .run({ $totalLikes: getTotalLikes.likes + 1, $animeId: this.id });
+
       console.log("done");
       return { message: "success 2" };
     } catch (error: any) {
