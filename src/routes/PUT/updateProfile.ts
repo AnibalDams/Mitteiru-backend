@@ -1,12 +1,12 @@
 import Profile from "../../classes/profiles";
 import type {Response, Request} from 'express'
 
-export default function updateProfile(req:Request, res:Response){
+export default async function updateProfile(req:Request, res:Response){
 
     try {
         const profileId = Number(req.params.profileId)
         const {name,photo} = req.body
-        const update = new Profile(profileId,name,photo,0).update()
+        const update = await new Profile(profileId,name,photo,0).update()
         switch(update.message){
             case "success":
                 res.statusCode = 200

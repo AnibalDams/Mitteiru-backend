@@ -29,37 +29,24 @@ export default class Episode {
     this.animeId = animeId;
   }
 
-  new(): ReturnData {
-    const newEpisodeQuery = database.query(
-      "INSERT INTO Episodes(name,episode_number,synopsis,thumbnail,link,anime_id) VALUES($name,$episodeNumber,$synopsis,$thumbnail,$link,$animeId)"
-    );
+  async new():Promise<ReturnData> {
 
     try {
-      const doesTheAnimeExist = new Anime(this.animeId).getById();
+      const doesTheAnimeExist = await new Anime(this.animeId).getById();
 
       if (!doesTheAnimeExist.animes) {
         return { message: "The anime does not exist" };
       } else {
-        const verifyEpisode = database.query(`SELECT id FROM Episodes WHERE episode_number=$episodeNumber AND anime_id=$animeId`).get({$episodeNumber:this.episodeNumber,$animeId:this.animeId})
-        if (verifyEpisode) {
-          database.query(`UPDATE Episodes SET name=$name,episode_number=$episodeNumber,synopsis=$synopsis,thumbnail=$thumbnail,link=$link WHERE episode_number=$episodeNumber AND anime_id=$animeId`).run({
-            $name: this.name,
-            $episodeNumber: this.episodeNumber,
-            $synopsis: this.synopsis,
-            $thumbnail: this.thumbnail,
-            $link: this.link,
-          });
+        const verifyEpisode =await database.sql`SELECT id FROM Episodes WHERE episode_number=${this.episodeNumber} AND anime_id=${this.animeId}`
+        if (verifyEpisode[0]) {
+          database.sql`UPDATE Episodes SET name=${this.name},episode_number=${this.episodeNumber},synopsis=${this.synopsis},thumbnail=${this.thumbnail},link=${this.link} WHERE episode_number=${this.episodeNumber} AND anime_id=${this.animeId}`
+          
           console.log("episode updated")
           return { message: "The episode was added to the anime"}
         }
-        newEpisodeQuery.run({
-          $name: this.name,
-          $episodeNumber: this.episodeNumber,
-          $synopsis: this.synopsis,
-          $thumbnail: this.thumbnail,
-          $link: this.link,
-          $animeId: this.animeId,
-        });
+        await database.sql
+        `INSERT INTO Episodes(name,episode_number,synopsis,thumbnail,link,anime_id) VALUES(${this.name},${this.episodeNumber},${this.synopsis},${this.thumbnail},${this.link},${this.animeId})`
+      
 
         return { message: "The episode was added to the anime" };
       }
@@ -71,16 +58,15 @@ export default class Episode {
     }
   }
 
-  getAll():ReturnData {
+ async getAll():Promise<ReturnData> {
     
-    const getEpisodes = database.query(`SELECT * FROM Episodes WHERE anime_id=$animeId`)
 
     try{
-      const doesTheAnimeExist = new Anime(this.animeId).getById();
+      const doesTheAnimeExist =await new Anime(this.animeId).getById();
       if (!doesTheAnimeExist.animes) {
         return { message: "The anime does not exist" };
       }
-      const episodes = getEpisodes.all({$animeId: this.animeId});
+      const episodes = await database.sql`SELECT * FROM Episodes WHERE anime_id=${this.animeId}`;
       return {message:"success",episodes:episodes}
     
     }catch (error:any) {

@@ -12,37 +12,29 @@ export default class List {
     this.profileId = profileId;
   }
 
-  new(): ReturnData {
-    const newList = database.query(
-      `INSERT INTO Lists (name, profile_id) VALUES($name, $profileId)`
-    );
-    const verifyProfile = database.query(
-      `SELECT id FROM Profiles WHERE id=$profileId`
-    );
+  async new(): Promise<ReturnData> {
     try {
-      const profile = verifyProfile.get({ $profileId: this.profileId });
-      if (!profile) {
+      const verifyProfile =
+        await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
+      if (!verifyProfile[0]) {
         return { message: "profile not found" };
       }
-      newList.run({ $name: this.name, $profileId: this.profileId });
+      await database.sql`INSERT INTO Lists (name, profile_id) VALUES(${this.name}, ${this.profileId})`;
       return { message: "Success" };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
     }
   }
 
-  getAll(): ReturnData {
-    const getAll = database.query(
-      `SELECT * FROM Lists WHERE profile_id=$profileId`
-    );
+  async getAll(): Promise<ReturnData> {
     try {
-      const verifyProfile = database
-        .query(`SELECT id FROM Profiles WHERE id=$profileId`)
-        .get({ $profileId: this.profileId });
-        if(!verifyProfile){
-            return {message: "Profile not found"}
-        }
-      const all = getAll.all({ $profileId: this.profileId });
+      const verifyProfile =
+        await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
+      if (!verifyProfile[0]) {
+        return { message: "Profile not found" };
+      }
+      const all =
+        await database.sql`SELECT * FROM Lists WHERE profile_id=${this.profileId}`;
       return { message: "Success", lists: all };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };

@@ -1,10 +1,10 @@
 import { Anime } from "../../classes/animes";
 import type { Response, Request } from "express";
 
-export default function getAnimesOfAnStudio(req: Request, res: Response) {
+export default async function getAnimesOfAnStudio(req: Request, res: Response) {
   try {
     const studio = req.params.studio;
-    const animes = new Anime(0, "", "", "", "", studio).getAnimesOfAnStudio();
+    const animes =await new Anime(0, "", "", "", "", studio).getAnimesOfAnStudio();
     switch (animes.message) {
       case "success":
         res.statusCode = 200;

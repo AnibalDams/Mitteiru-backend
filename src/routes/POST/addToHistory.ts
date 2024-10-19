@@ -1,12 +1,12 @@
 import History from "../../classes/history";
 import type { Response, Request } from "express";
 
-export default function addToHistory(req: Request, res: Response) {
+export default async function addToHistory(req: Request, res: Response) {
   try {
     const animeId = Number(req.params.animeId);
     const episodeNumber = Number(req.params.episodeNumber);
     const profileId = Number(req.params.profileId);
-    const history = new History(0, animeId, episodeNumber, 0,profileId).add();
+    const history = await new History(0, animeId, episodeNumber, 0,profileId).add();
     switch (history.message) {
       case "Success":
         res.statusCode = 201;

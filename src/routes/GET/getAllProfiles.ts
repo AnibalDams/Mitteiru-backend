@@ -1,10 +1,10 @@
 import Profile from "../../classes/profiles";
 import type { Response, Request } from "express";
 
-export default function getAllProfiles(req: Request, res: Response) {
+export default async function getAllProfiles(req: Request, res: Response) {
   try {
     const userId = Number(req.params.userId);
-    const allProfiles = new Profile(0, "", "", userId).getAll();
+    const allProfiles = await new Profile(0, "", "", userId).getAll();
     switch (allProfiles.message) {
       case "User not found":
         res.statusCode = 404;

@@ -2,10 +2,10 @@ import { Anime } from "../../classes/animes";
 import type { Response,Request } from "express";
 
 
-export default function getMostPopularAnimes(req:Request, res:Response):void{
+export default async function getMostPopularAnimes(req:Request, res:Response){
     try {
         const animes = new Anime()
-        const mostPopular = animes.getMostPopular()
+        const mostPopular =await animes.getMostPopular()
         switch(mostPopular.message){
             case "success":
                 res.statusCode = 200

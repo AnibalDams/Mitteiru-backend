@@ -1,11 +1,11 @@
 import Profile from "../../classes/profiles";
 import type { Response, Request } from "express";
 
-export default function newProfile(req: Request, res: Response): void {
+export default async function newProfile(req: Request, res: Response){
   try {
     const userId = Number(req.params.userId);
     const { name, photo } = req.body;
-    const newProfile = new Profile(0, name, photo, userId).new();
+    const newProfile =await new Profile(0, name, photo, userId).new();
 
     switch (newProfile.message) {
       case "User not found":

@@ -1,10 +1,10 @@
 import Profile from "../../classes/profiles";
 import type { Response, Request } from "express";
 
-export default function defaultProfile(req: Request, res: Response) {
+export default async function defaultProfile(req: Request, res: Response) {
   try {
     const profileId = Number(req.params.profileId);
-    const deleteProfile = new Profile(profileId).delete();
+    const deleteProfile = await new Profile(profileId).delete();
     switch (deleteProfile.message) {
       case "success":
         res.statusCode = 200;

@@ -1,10 +1,10 @@
 import List from "../../classes/lists";
 import type { Response, Request } from "express";
 
-export default function getLists(req: Request, res: Response) {
+export default async function getLists(req: Request, res: Response) {
   try {
     const profileId = Number(req.params.profileId);
-    const allLists = new List(0, "", profileId).getAll();
+    const allLists = await new List(0, "", profileId).getAll();
     switch (allLists.message) {
       case "Profile not found":
         res.statusCode = 404;

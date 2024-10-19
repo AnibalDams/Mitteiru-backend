@@ -12,31 +12,20 @@ export default class User {
     this.password = password;
   }
 
-  create(): ReturnData {
-    const createUser = database.query(
-      `INSERT INTO User (username, email, password) VALUES($username,$email,$password)`
-    );
-    const verifyUsername = database.query(
-      `SELECT username FROM User WHERE username = $username`
-    );
-    const verifyEmail = database.query(
-      `SELECT email FROM User WHERE email = $email`
-    );
+  async create(): Promise<ReturnData> {
     try {
-      const username = verifyUsername.get({ $username: this.username });
-
-      if (username) {
+      const username =
+        await database.sql`SELECT username FROM User WHERE username = ${this.username}`;
+      if (username[0]) {
         return { message: "Username already used" };
       }
-      const email = verifyEmail.get({ $email: this.email });
-      if (email) {
+      const email =
+        await database.sql`SELECT email FROM User WHERE email = ${this.email}`;
+      if (email[0]) {
         return { message: "email already used" };
       }
-      createUser.run({
-        $username: this.username,
-        $email: this.email,
-        $password: this.password,
-      });
+      await database.sql`INSERT INTO User (username, email, password) VALUES(${this.username},${this.email},${this.password})`;
+
       return { message: "User created successfully" };
     } catch (error: any) {
       return {
@@ -46,17 +35,16 @@ export default class User {
     }
   }
 
-  login(): ReturnData {
-    const login = database.query(
-      `SELECT * FROM User WHERE email=$email AND password=$password`
-    );
+  async login():Promise< ReturnData> {
 
     try {
-      const user = login.get({ $email: this.email, $password: this.password });
-      if (!user) {
+      const user = await database.sql
+      `SELECT * FROM User WHERE email=${this.email} AND password=${this.password}`
+    ;
+      if (!user[0]) {
         return { message: "Invalid Email/Password" };
       }
-      return { message: "success", user: user };
+      return { message: "success", user: user[0] };
     } catch (error: any) {
       return {
         message: "An error has occurred while getting the user",

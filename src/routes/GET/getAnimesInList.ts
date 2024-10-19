@@ -1,10 +1,10 @@
 import AnimesInList from '../../classes/animesInList'
 import type {Response, Request} from 'express'
 
-export default function getAnimesInList(req:Request, res:Response){
+export default async function getAnimesInList(req:Request, res:Response){
     try {
         const profileId = Number(req.params.profileId)
-        const animes = new AnimesInList(0,0,0,profileId).getAll()
+        const animes = await new AnimesInList(0,0,0,profileId).getAll()
         switch(animes.message){
             case "success":
                 res.statusCode = 200

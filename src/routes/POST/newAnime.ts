@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { Anime } from "../../classes/animes";
 
-export default function newAnime(req: Request, res: Response):void {
+export default async function newAnime(req: Request, res: Response) {
   try {
     const {
       name,
@@ -29,7 +29,7 @@ export default function newAnime(req: Request, res: Response):void {
       genres
     );
 
-    let createAnime = anime.new();
+    let createAnime = await anime.new();
     switch (createAnime.message) {
       case "The anime has been created successfully":
         res.statusCode = 201;

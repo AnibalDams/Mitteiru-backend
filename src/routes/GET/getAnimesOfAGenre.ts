@@ -1,10 +1,10 @@
 import Genre from "../../classes/genres";
 import type {Response, Request} from 'express'
 
-export default function getAnimesOfAGenre(req:Request, res:Response){
+export default async function getAnimesOfAGenre(req:Request, res:Response){
     try {
         const genre = req.params.genre
-        const animes = new Genre(0,genre).getAnimes()
+        const animes = await new Genre(0,genre).getAnimes()
         switch(animes.message){
             case "Success":
                 res.statusCode = 200

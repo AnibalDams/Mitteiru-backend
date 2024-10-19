@@ -1,11 +1,11 @@
 import User from "../../classes/users";
 import type { Response, Request } from "express";
 
-export default function signUp(req: Request, res: Response) {
+export default async function signUp(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
     const user = new User("", email, password);
-    const getUser = user.login();
+    const getUser =await user.login();
 
     switch (getUser.message) {
       case "Invalid Email/Password":

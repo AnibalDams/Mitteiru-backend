@@ -1,11 +1,11 @@
 import Episode from "../../classes/episodes";
 import type { Response, Request } from "express";
 
-export default function addEpisode(req: Request, res: Response):void {
+export default async function addEpisode(req: Request, res: Response) {
   try {
     const animeId = Number(req.params.animeId);
     const { name,episodeNumber, synopsis, thumbnail, link } = req.body;
-    const newEpisode = new Episode(
+    const newEpisode = await new Episode(
       0,
       name,
       episodeNumber,

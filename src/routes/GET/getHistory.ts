@@ -1,10 +1,10 @@
 import History from "../../classes/history";
 import type { Response, Request } from "express";
 
-export default function getHistory(req: Request, res: Response) {
+export default async function getHistory(req: Request, res: Response) {
   try {
     const profileId = Number(req.params.profileId);
-    const getH = new History(0, 0, 0, 0, profileId).get();
+    const getH = await new History(0, 0, 0, 0, profileId).get();
     switch (getH.message) {
       case "Success":
         res.statusCode = 200;

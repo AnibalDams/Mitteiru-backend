@@ -1,10 +1,10 @@
 import type { Response, Request } from "express";
 import Episode from "../../classes/episodes";
 
-export default function getEpisodes(req: Request, res: Response): void {
+export default async function getEpisodes(req: Request, res: Response){
   try {
     const animeId = Number(req.params.animeId);
-    const episodes = new Episode(0,"",0,"","","",animeId).getAll();
+    const episodes = await new Episode(0,"",0,"","","",animeId).getAll();
 
     switch (episodes.message) {
       case "The anime does not exist":

@@ -1,10 +1,10 @@
 import { Anime } from "../../classes/animes";
 import type { Response, Request } from "express";
 
-export default function getLikes(req: Request, res: Response) {
+export default async function getLikes(req: Request, res: Response) {
   try {
     const animeId = Number(req.params.animeId);
-    const likes = new Anime(animeId).getLikes();
+    const likes = await new Anime(animeId).getLikes();
     switch (likes.message) {
       case "Success":
         res.statusCode = 200;

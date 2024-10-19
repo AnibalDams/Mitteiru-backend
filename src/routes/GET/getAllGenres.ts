@@ -1,9 +1,9 @@
 import Genre from "../../classes/genres";
 import type {Response, Request} from 'express'
 
-export default function getAllGenres(req:Request, res:Response){
+export default async function getAllGenres(req:Request, res:Response){
     try {
-        const genres = new Genre().getAll()
+        const genres =await new Genre().getAll()
         switch(genres.message){
             case "Success":
                 res.statusCode = 200

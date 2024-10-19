@@ -19,26 +19,21 @@ export default class Profile {
     this.userId = userId;
   }
 
-  new(): ReturnData {
-    const newProfile = database.query(
-      `INSERT INTO Profiles(name, photo, user_id) VALUES($name,$photo,$userId)`
-    );
+  async new():Promise< ReturnData> {
     const defaultLists = ["Watching", "Completed", "Planning", "Paused", "Dropped"]
     try {
-      const verifyUser = database
-        .query(`SELECT id FROM User WHERE id = $userId`)
-        .get({ $userId: this.userId });
-      if (!verifyUser) {
+      const verifyUser = await database
+        .sql`SELECT id FROM User WHERE id = ${this.userId}`
+      if (!verifyUser[0]) {
         return { message: "User not found" };
       }
-      const profile:any = newProfile.run({
-        $name: this.name,
-        $photo: this.photo,
-        $userId: this.userId,
-      });
+      await database.sql
+      `INSERT INTO Profiles(name, photo, user_id) VALUES(${this.name},${this.photo},${this.userId})`
+    ;
+      const profile:any = await database.get(`SELECT last_insert_rowid() as id`);
       for (let i = 0; i < defaultLists.length; i++) {
         const listName = defaultLists[i];
-        const list = new List(0,listName,profile.lastInsertRowid)
+        const list = new List(0,listName,profile.id)
         list.new()        
       }
 
@@ -51,16 +46,16 @@ export default class Profile {
     }
   }
 
-  getAll(): ReturnData {
-    const getAllProfiles = database.query(
-      `SELECT * FROM Profiles WHERE user_id = $userId`
-    );
+  async getAll():Promise< ReturnData> {
+
     try {
-      const verifyUser = database.query(`SELECT id FROM User WHERE id = $userId`).get({ $userId: this.userId });
-      if (!verifyUser) {
+      const verifyUser =await database.sql`SELECT id FROM User WHERE id = ${this.userId}`
+      if (!verifyUser[0]) {
         return { message: "User not found" };
       }
-      const allProfiles = getAllProfiles.all({ $userId: this.userId });
+      const allProfiles = await database.sql
+      `SELECT * FROM Profiles WHERE user_id = ${this.userId}`
+    ;
       return { message: "success", profiles: allProfiles };
     } catch (error: any) {
       return {
@@ -70,18 +65,18 @@ export default class Profile {
     }
   }
 
-  delete():ReturnData{
+  async delete():Promise<ReturnData>{
     try {
-      database.query(`DELETE FROM Profiles WHERE id=$profileId`).run({$profileId: this.id})
+      await database.sql`DELETE FROM Profiles WHERE id=${this.id}`
       return {message: "success"}
     } catch (error:any) {
       return {message: "An error has occurred while deleting the profile", error: error.message}
     }
   }
 
-  update():ReturnData{
+  async update():Promise<ReturnData>{
     try {
-      database.query(`UPDATE Profiles SET name=$name,photo=$profilePhoto WHERE id=$profileId`).run({$profileId:this.id,$profilePhoto:this.photo, $name:this.name})
+      database.sql`UPDATE Profiles SET name=${this.name},photo=${this.photo} WHERE id=${this.id}`
       return {message:"success"}
     } catch (error:any) {
       return {message: "An error has occurred while updating the profile", error: error.message}

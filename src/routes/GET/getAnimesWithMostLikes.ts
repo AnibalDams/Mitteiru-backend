@@ -3,7 +3,7 @@ import type { Response, Request } from "express";
 
 export default async function getMostLikedAnimes(req: Request, res: Response) {
   try {
-    const mostLikedAnimes = new Anime().getMostLiked();
+    const mostLikedAnimes =await new Anime().getMostLiked();
     switch (mostLikedAnimes.message) {
       case "success":
         res.statusCode = 200;

@@ -1,10 +1,10 @@
 import { Anime } from "../../classes/animes";
 import type { Response, Request } from "express";
 
-export default function getSimilarAnimes(req: Request, res: Response): void {
+export default async function getSimilarAnimes(req: Request, res: Response){
   try {
     const animeId = Number(req.params.animeId);
-    const animes = new Anime(animeId).getSimilar();
+    const animes =await new Anime(animeId).getSimilar();
     switch (animes.message) {
       case "no genres found":
         res.statusCode = 404;

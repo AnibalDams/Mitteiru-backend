@@ -1,11 +1,11 @@
 import User from '../../classes/users'
 import type {Response, Request} from 'express'
 
-export default function signUp(req:Request, res:Response){
+export default async function signUp(req:Request, res:Response){
     try {
         const{username,email,password} = req.body
         const user = new User(username, email, password)
-        const createUser = user.create()
+        const createUser =await user.create()
 
         switch(createUser.message){
             case "Username already used":

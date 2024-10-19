@@ -3,11 +3,11 @@ import type { Response, Request } from "express";
 
 
 
-export default function getByAnimeById(req: Request, res: Response):void{
+export default async function getByAnimeById(req: Request, res: Response){
     try{
         const animeId = Number(req.params.animeId)
         const anime = new Anime(animeId)
-        const getByAnimeById = anime.getById()
+        const getByAnimeById =await anime.getById()
         switch (getByAnimeById.message) {
             case "anime found":
                 res.statusCode = 200

@@ -22,16 +22,15 @@ export default class History {
     this.profileId = profileId;
   }
 
-  add(): ReturnData {
+  async add():Promise<ReturnData> {
     try {
       const today = new Date().getTime();
       const todayString = new Date(today).toISOString().substring(0, 10);
 
-      const isThereAnime: any = database
-        .query(
-          `SELECT id, date FROM History WHERE anime_id = $animeId AND profile_id=$profileId`
-        )
-        .all({ $animeId: this.animeId, $profileId: this.profileId });
+      const isThereAnime: any = await database
+        .sql
+          `SELECT id, date FROM History WHERE anime_id = ${this.animeId} AND profile_id=${this.profileId}`
+        
       const dates: any = {};
       for (let i = 0; i < isThereAnime.length; i++) {
         const anime = isThereAnime[i];
@@ -39,16 +38,10 @@ export default class History {
         dates[animeDate] = animeDate;
       }
       if (!dates[todayString]) {
-        database
-          .query(
-            `INSERT INTO history (anime_id, episode_number, date, profile_id) VALUES($animeId, $episodeNumber,$date,$profileId)`
-          )
-          .run({
-            $animeId: this.animeId,
-            $episodeNumber: this.episodeNumber,
-            $date: today,
-            $profileId: this.profileId,
-          });
+        await database
+          .sql
+            `INSERT INTO history (anime_id, episode_number, date, profile_id) VALUES(${this.animeId}, ${this.episodeNumber},${today},${this.profileId})`
+          
       }
 
       return { message: "Success" };
@@ -60,13 +53,12 @@ export default class History {
     }
   }
 
-  get(): ReturnData {
+  async get():Promise< ReturnData> {
     try {
-      const history = database
-        .query(
-          `SELECT Animes.id, Animes.name,Animes.japanese_name, Animes.release_year,Animes.studio,Animes.cover, History.date FROM History INNER JOIN Animes ON Animes.id = History.anime_id WHERE profile_id = $profileId ORDER BY History.date DESC`
-        )
-        .all({ $profileId: this.profileId });
+      const history = await database
+        .sql
+          `SELECT Animes.id, Animes.name,Animes.japanese_name, Animes.release_year,Animes.studio,Animes.cover, History.date FROM History INNER JOIN Animes ON Animes.id = History.anime_id WHERE profile_id = ${this.profileId} ORDER BY History.date DESC`
+        
       const dates: any = [];
       for (let i = 0; i < history.length; i++) {
         const log: any = history[i];

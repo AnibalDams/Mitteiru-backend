@@ -39,65 +39,52 @@ export class Anime {
     this.horizontalImage = horizontalImage;
     this.genres = genres;
   }
-  new(): ReturnData {
-    const createAnimeQuery = database.query(`
-            INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES($name,$japanese_name,$synopsis,$release_year,$studio,$cover,$image,$horizontal_image,$on_going,0)`);
+  async new(): Promise<ReturnData> {
+   
     try {
-      const verifyAnime = database
-        .query(`SELECT id FROM Animes WHERE name=$name`)
-        .get({ $name: this.name });
+      const verifyAnime =await database
+        .sql`
+        SELECT id FROM Animes WHERE name=${this.name}`
+        
       if (verifyAnime) {
         database
-          .query(
-            `UPDATE Animes SET name=$name,japanese_name=$japanese_name,synopsis=$synopsis,release_year=$release_year,studio=$studio,cover=$cover,image=$image,horizontal_image=$horizontal_image,on_going=$on_going WHERE name=$name`
-          )
-          .run({
-            $name: this.name,
-            $japanese_name: this.japaneseName,
-            $synopsis: this.synopsis,
-            $release_year: this.releaseYear,
-            $studio: this.studio,
-            $cover: this.cover,
-            $image: this.image,
-            $horizontal_image: this.horizontalImage,
-            $on_going: this.onGoing,
-          });
+          .sql
+            `
+            UPDATE Animes SET name=${this.name},japanese_name=${this.japaneseName},synopsis=${this.synopsis},release_year=${this.releaseYear},studio=${this.studio},cover=${this.cover},image=${this.image},horizontal_image=${this.horizontalImage},on_going=${this.onGoing} WHERE name=${this.name}`
+          
         console.log("anime updated");
         return {
           message: "The anime has been created successfully",
         };
       }
-      let createAnime = createAnimeQuery.run({
-        $name: this.name,
-        $japanese_name: this.japaneseName,
-        $synopsis: this.synopsis,
-        $release_year: this.releaseYear,
-        $studio: this.studio,
-        $cover: this.cover,
-        $image: this.image,
-        $horizontal_image: this.horizontalImage,
-        $on_going: this.onGoing,
-      });
-      const animeId = createAnime.lastInsertRowid;
+      await database.sql`
+        INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES(${this.name},${this.japaneseName},${this.synopsis},${this.releaseYear},${this.studio},${this.cover},${this.image},${this.horizontalImage},${this.onGoing},0)`;
+        
+      const getAnimeId =  await database.sql`
+      USE DATABASE db.sqlite;
+      SELECT id FROM Animes WHERE name=${this.name}
+      
+      `;
+      const animeId = getAnimeId[0].id;
 
 
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
-        const doesTheGenreExistQuery = database.query(
-          `SELECT id FROM Genre WHERE name=$name`
-        );
-        const doesTheGenreExist = doesTheGenreExistQuery.all({ $name: genre });
+        const doesTheGenreExist =await database.sql
+          `SELECT id FROM Genre WHERE name=${genre}`
+        ;
+   
         if (doesTheGenreExist.length <= 0) {
-          database
-            .query(`INSERT INTO Genre(name) VALUES ($name)`)
-            .run({ $name: genre });
-          database
-            .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
-            .run({ $name: genre, $anime_id: animeId });
+          await database
+            .sql`INSERT INTO Genre(name) VALUES (${genre})`
+            
+          await database
+            .sql`INSERT INTO Genres(name,anime_id) VALUES(${genre},${animeId})`
+            
         } else {
-          database
-            .query(`INSERT INTO Genres(name,anime_id) VALUES($name,$anime_id)`)
-            .run({ $name: genre, $anime_id: animeId });
+          await database
+            .sql`INSERT INTO Genres(name,anime_id) VALUES(${genre},${animeId})`
+            
         }
       }
       return {
@@ -111,14 +98,11 @@ export class Anime {
     }
   }
 
-  getAll(): ReturnData {
-    const getAllAnimeQuery = database.query(
-      `SELECT * FROM Animes ORDER BY Animes.id DESC`
-    );
-
+  async getAll():Promise<ReturnData> {
     try {
-      const animes = getAllAnimeQuery.all();
-
+      const getAnimes =  await database.sql`
+      SELECT * FROM Animes ORDER BY Animes.id DESC`
+      const animes = await getAnimes
       return { message: "animes found", animes: animes };
     } catch (error: any) {
       return {
@@ -128,24 +112,22 @@ export class Anime {
     }
   }
 
-  getById(): ReturnData {
-    const getByAnimeByIdQuery = database.query(
-      `SELECT * from Animes WHERE id=$id`
-    );
+  async getById():Promise<ReturnData> {
+
     try {
-      const anime: any = getByAnimeByIdQuery.get({ $id: this.id });
-      const views = anime.views_ == null ? 0 : anime.views_ + 1;
-      if (anime != null) {
-        database
-          .query(`UPDATE Animes SET views_=$views WHERE id=$animeId`)
-          .run({ $views: views, $animeId: anime.id });
+      const anime: any = await database.sql
+      `SELECT * from Animes WHERE id=${this.id}`;
+      const views = anime[0].views_ == null ? 0 : anime[0].views_ + 1;
+      if (anime[0] != null) {
+        await database
+          .sql`UPDATE Animes SET views_=${views} WHERE id=${anime[0].id}`
+          
       }
-      const getGenres = anime
-        ? database
-            .query(`SELECT * FROM Genres WHERE anime_id=$animeId`)
-            .all({ $animeId: anime.id })
+      const getGenres = anime[0]
+        ? await database
+            .sql`SELECT * FROM Genres WHERE anime_id=${anime[0].id}`
         : [];
-      return { message: "anime found", animes: anime, genres: getGenres };
+      return { message: "anime found", animes: anime[0], genres: getGenres };
     } catch (error: any) {
       return {
         message: "An error has occurred while getting the animes",
@@ -153,11 +135,10 @@ export class Anime {
       };
     }
   }
-  getAnimesOfAnStudio(): ReturnData {
+  async getAnimesOfAnStudio():Promise< ReturnData> {
     try {
-      const animes = database
-        .query(`SELECT * FROM Animes WHERE studio=$studio`)
-        .all({ $studio: this.studio });
+      const animes = await database
+        .sql`SELECT * FROM Animes WHERE studio=${this.studio}`
       return { message: "success", animes: animes };
     } catch (error: any) {
       return {
@@ -166,12 +147,11 @@ export class Anime {
       };
     }
   }
-  getMostPopular(): ReturnData {
-    const getMostPopularAnime = database.query(
-      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`
-    );
+ async getMostPopular(): Promise<ReturnData> {
     try {
-      const animes = getMostPopularAnime.all();
+      const animes = await database.sql
+      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`
+    ;
       return { message: "success", animes: animes };
     } catch (error: any) {
       return {
@@ -181,11 +161,10 @@ export class Anime {
     }
   }
 
-  getSimilar(): ReturnData {
+async  getSimilar():Promise< ReturnData> {
     try {
-      const genres: any = database
-        .query(`SELECT * FROM Genres WHERE anime_id=$animeId`)
-        .all({ $animeId: this.id });
+      const genres =await database
+        .sql`SELECT * FROM Genres WHERE anime_id=${this.id}`
       if (genres.length == 0) {
         return { message: "no genres found" };
       }
@@ -211,11 +190,10 @@ export class Anime {
       };
     }
   }
-  getAnimesOfAYear(): ReturnData {
+  async getAnimesOfAYear():Promise< ReturnData> {
     try {
-      const animes = database
-        .query(`SELECT * FROM Animes WHERE release_year=$releaseYear`)
-        .all({ $releaseYear: this.releaseYear });
+      const animes = await database
+        .sql`SELECT * FROM Animes WHERE release_year=${this.releaseYear}`
       return { message: "Success", animes: animes };
     } catch (error: any) {
       return {
@@ -224,35 +202,31 @@ export class Anime {
       };
     }
   }
-  addLike(profileId: number): ReturnData {
+  async addLike(profileId: number): Promise<ReturnData> {
     try {
       console.log("Function started");
       console.log("Verifying like");
-      const verifyLike = database
-        .query(
-          `SELECT * FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`
-        )
-        .get({ $profileId: profileId, $animeId: this.id });
-      const getTotalLikes: any = database
-        .query(`SELECT likes from animes_likes WHERE anime_id=$animeId`)
-        .get({ $animeId: this.id });
+      const verifyLike = await database
+        .sql
+          `SELECT * FROM Likes WHERE profile_id=${profileId} AND anime_id=${this.id}`
+        
+       
+
       console.log("Done");
       if (verifyLike) {
         console.log("There is a like, deleting it");
-        database
-          .query(
-            `DELETE FROM Likes WHERE profile_id=$profileId AND anime_id=$animeId`
-          )
-          .run({ $profileId: profileId, $animeId: this.id });
+        await database
+          .sql
+            `DELETE FROM Likes WHERE profile_id=${profileId} AND anime_id=${this.id}`
+          
 
         return { message: "success 1" };
       }
       console.log("There is no like, adding");
-      database
-        .query(
-          `INSERT INTO Likes(anime_id, profile_id) VALUES($animeId,$profileId)`
-        )
-        .run({ $animeId: this.id, $profileId: profileId });
+     await database
+        .sql
+          `INSERT INTO Likes(anime_id, profile_id) VALUES(${this.id},${profileId})`
+        
 
       console.log("done");
       return { message: "success 2" };
@@ -263,31 +237,27 @@ export class Anime {
       };
     }
   }
-  getLikes(): ReturnData {
+  async getLikes():Promise< ReturnData> {
     try {
-      const likes = database
-        .query("SELECT profile_id FROM Likes WHERE anime_id=$animeId")
-        .all({ $animeId: this.id });
+      const likes = await database
+        .sql`SELECT profile_id FROM Likes WHERE anime_id=${this.id}`
       return { message: "Success", likesCount: likes.length, profiles: likes };
     } catch (error: any) {
       return { message: "An error has occurred", error: error.message };
     }
   }
-  getMostLiked(): ReturnData {
+  async getMostLiked():Promise< ReturnData> {
     try {
-      // Consulta para obtener los animes con el número de likes de mayor a menor
-      const mostLikedAnimesQuery = database.query(`
+      const mostLikedAnimes =await database.sql`
         SELECT Animes.*, COUNT(Likes.anime_id) AS like_count
         FROM Animes
         LEFT JOIN Likes ON Animes.id = Likes.anime_id
         GROUP BY Animes.id
         ORDER BY like_count DESC
         LIMIT 10; 
-      `);
+      `;
 
-      const mostLikedAnimes = mostLikedAnimesQuery.all();
 
-      // Retornamos los animes junto con el conteo de likes
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
       return {
