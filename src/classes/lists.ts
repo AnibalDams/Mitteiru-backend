@@ -16,6 +16,7 @@ export default class List {
     try {
       const verifyProfile =
         await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
+        console.log(this.profileId)
       if (!verifyProfile[0]) {
         return { message: "profile not found" };
       }
@@ -28,13 +29,11 @@ export default class List {
 
   async getAll(): Promise<ReturnData> {
     try {
-      const verifyProfile =
-        await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
+      const verifyProfile = await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
       if (!verifyProfile[0]) {
         return { message: "Profile not found" };
       }
-      const all =
-        await database.sql`SELECT * FROM Lists WHERE profile_id=${this.profileId}`;
+      const all = await database.sql`SELECT * FROM Lists WHERE profile_id=${this.profileId}`;
       return { message: "Success", lists: all };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };

@@ -213,7 +213,7 @@ async  getSimilar():Promise< ReturnData> {
        
 
       console.log("Done");
-      if (verifyLike) {
+      if (verifyLike[0]) {
         console.log("There is a like, deleting it");
         await database
           .sql

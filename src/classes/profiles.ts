@@ -30,11 +30,11 @@ export default class Profile {
       await database.sql
       `INSERT INTO Profiles(name, photo, user_id) VALUES(${this.name},${this.photo},${this.userId})`
     ;
-      const profile:any = await database.get(`SELECT last_insert_rowid() as id`);
+      const profile:any = await database.sql`SELECT last_insert_rowid() as id`;
       for (let i = 0; i < defaultLists.length; i++) {
         const listName = defaultLists[i];
-        const list = new List(0,listName,profile.id)
-        list.new()        
+        const list = new List(0,listName,profile[0].id)
+        await list.new()        
       }
 
       return { message: "success" };
