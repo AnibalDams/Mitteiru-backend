@@ -170,7 +170,7 @@ async  getSimilar():Promise< ReturnData> {
       }
       const randomNumber = getRandomInt(0, genres ? genres.length - 1 : 1);
       const animes: any[] = [];
-      const allAnimes = new Genre(
+      const allAnimes =await new Genre(
         0,
         genres ? genres[randomNumber].name : ""
       ).getAnimes();
