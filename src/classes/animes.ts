@@ -150,7 +150,7 @@ export class Anime {
  async getMostPopular(): Promise<ReturnData> {
     try {
       const animes = await database.sql
-      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 10`
+      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 12`
     ;
       return { message: "success", animes: animes };
     } catch (error: any) {
@@ -254,7 +254,7 @@ async  getSimilar():Promise< ReturnData> {
         LEFT JOIN Likes ON Animes.id = Likes.anime_id
         GROUP BY Animes.id
         ORDER BY like_count DESC
-        LIMIT 10; 
+        LIMIT 12; 
       `;
 
 
