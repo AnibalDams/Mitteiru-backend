@@ -16,7 +16,7 @@ export default async function newAnime(req: Request, res: Response) {
       genres,
     } = req.body;
     const anime = new Anime(
-      0,
+      "",
       name,
       japaneseName,
       synopsis,

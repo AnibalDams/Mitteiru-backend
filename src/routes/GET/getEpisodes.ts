@@ -3,8 +3,8 @@ import Episode from "../../classes/episodes";
 
 export default async function getEpisodes(req: Request, res: Response){
   try {
-    const animeId = Number(req.params.animeId);
-    const episodes = await new Episode(0,"",0,"","","",animeId).getAll();
+    const animeId = req.params.animeId;
+    const episodes = await new Episode("","",0,"","","",animeId).getAll();
 
     switch (episodes.message) {
       case "The anime does not exist":

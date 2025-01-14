@@ -3,7 +3,7 @@ import type { Response, Request } from "express";
 
 export default async function getLikes(req: Request, res: Response) {
   try {
-    const animeId = Number(req.params.animeId);
+    const animeId = req.params.animeId;
     const likes = await new Anime(animeId).getLikes();
     switch (likes.message) {
       case "Success":

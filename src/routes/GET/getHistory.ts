@@ -3,8 +3,8 @@ import type { Response, Request } from "express";
 
 export default async function getHistory(req: Request, res: Response) {
   try {
-    const profileId = Number(req.params.profileId);
-    const getH = await new History(0, 0, 0, 0, profileId).get();
+    const profileId = req.params.profileId;
+    const getH = await new History("", "", 0, 0, profileId).get();
     switch (getH.message) {
       case "Success":
         res.statusCode = 200;

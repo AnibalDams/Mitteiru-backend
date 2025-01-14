@@ -1,5 +1,8 @@
-import database from "../libs/db";
+import dbClient from "../libs/dbClient";
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 import type ReturnData from "../libs/types/returnData";
+
 
 export default class User {
   username: string;
@@ -14,17 +17,22 @@ export default class User {
 
   async create(): Promise<ReturnData> {
     try {
-      const username =
-        await database.sql`SELECT username FROM User WHERE username = ${this.username}`;
-      if (username[0]) {
+      const password = await bcrypt.hash(this.password, 10);
+      const username = await dbClient.collection("user").findOne({ username: this.username });
+      if (username != null) {
         return { message: "Username already used" };
       }
       const email =
-        await database.sql`SELECT email FROM User WHERE email = ${this.email}`;
-      if (email[0]) {
+        await dbClient.collection("user").findOne({email:this.email});
+      if (email != null) {
         return { message: "email already used" };
       }
-      await database.sql`INSERT INTO User (username, email, password) VALUES(${this.username},${this.email},${this.password})`;
+      await dbClient.collection("user").insertOne({
+        username: this.username,
+        email: this.email,
+        password: password,
+      })
+      
 
       return { message: "User created successfully" };
     } catch (error: any) {
@@ -38,18 +46,31 @@ export default class User {
   async login():Promise< ReturnData> {
 
     try {
-      const user = await database.sql
-      `SELECT * FROM User WHERE email=${this.email} AND password=${this.password}`
+      const user = await dbClient.collection("user").findOne({email:this.email});
     ;
-      if (!user[0]) {
-        return { message: "Invalid Email/Password" };
+      if (user == null) {
+        return { message: "Invalid Email" };
+      } 
+      const match = await bcrypt.compare(this.password, user.password);
+      if(match){
+            const token = jwt.sign({email:this.email, username:this.username, _id:user._id.toString()},process.env.SECRET_KEY as string);
+        return { message: "success", user: token };
+
       }
-      return { message: "success", user: user[0] };
+      return { message: "Invalid Password" };
     } catch (error: any) {
       return {
         message: "An error has occurred while getting the user",
         error: error.message,
       };
+    }
+  }
+  decodeToken(token:string):ReturnData{
+    try {
+      const tokenInfo = jwt.verify(token, process.env.SECRET_KEY as string);
+      return {message:"Success", user:tokenInfo}
+    } catch (error:any) {
+      return {message :"There was an error decoding the token", error:error.message}
     }
   }
 }

@@ -4,7 +4,7 @@ import type {Response, Request} from 'express'
 export default async function getAnimesOfAGenre(req:Request, res:Response){
     try {
         const genre = req.params.genre
-        const animes = await new Genre(0,genre).getAnimes()
+        const animes = await new Genre("",genre).getAnimes()
         switch(animes.message){
             case "Success":
                 res.statusCode = 200

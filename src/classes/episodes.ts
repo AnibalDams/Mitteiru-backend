@@ -1,24 +1,26 @@
 import database from "../libs/db";
+import dbClient from "../libs/dbClient";
 import { Anime } from "./animes";
 import type ReturnData from "../libs/types/returnData";
+import { MongoDBCollectionNamespace, ObjectId } from "mongodb";
 
 export default class Episode {
-  id: number;
+  id: string;
   name: string;
   episodeNumber: number;
   thumbnail: string;
   synopsis: string;
   link: string;
-  animeId: number;
+  animeId: string;
 
   constructor(
-    id: number = 0,
+    id: string = "",
     name: string = "",
     episodeNumber: number =0,
     thumbnail: string = "",
     synopsis: string = "",
     link: string = "",
-    animeId: number = 0
+    animeId: string = ""
   ) {
     this.id = id;
     this.name = name;
@@ -34,23 +36,36 @@ export default class Episode {
     try {
       const doesTheAnimeExist = await new Anime(this.animeId).getById();
 
-      if (!doesTheAnimeExist.animes) {
+      if (!doesTheAnimeExist.animes === null) {
         return { message: "The anime does not exist" };
       } else {
-        const verifyEpisode =await database.sql`SELECT id FROM Episodes WHERE episode_number=${this.episodeNumber} AND anime_id=${this.animeId}`
-        if (verifyEpisode[0]) {
-          database.sql`UPDATE Episodes SET name=${this.name},episode_number=${this.episodeNumber},synopsis=${this.synopsis},thumbnail=${this.thumbnail},link=${this.link} WHERE episode_number=${this.episodeNumber} AND anime_id=${this.animeId}`
+        const verifyEpisode =await dbClient.collection("episodes").findOne({episodeNumber:this.episodeNumber, animeId:new ObjectId(this.animeId)})
+        
+        if (verifyEpisode != null) {
+          await dbClient.collection("episodes").findOneAndUpdate({_id:verifyEpisode._id},{$set:{
+            name:this.name,
+            synopsis:this.synopsis,
+            thumbnail:this.thumbnail,
+            link:this.link
+          }})
           
           console.log("episode updated")
           return { message: "The episode was added to the anime"}
         }
-        await database.sql
-        `INSERT INTO Episodes(name,episode_number,synopsis,thumbnail,link,anime_id) VALUES(${this.name},${this.episodeNumber},${this.synopsis},${this.thumbnail},${this.link},${this.animeId})`
-      
+        await dbClient.collection("episodes").insertOne({
+          name:this.name,
+          synopsis:this.synopsis,
+          thumbnail:this.thumbnail,
+          link:this.link,
+          animeId:new ObjectId(this.animeId),
+          episodeNumber:this.episodeNumber
+
+        })
 
         return { message: "The episode was added to the anime" };
       }
     } catch (error: any) {
+      console.error(error)
       return {
         message: "An error has occurred while adding the episode",
         error: error.message,
@@ -63,12 +78,13 @@ export default class Episode {
 
     try{
       const doesTheAnimeExist =await new Anime(this.animeId).getById();
-      if (!doesTheAnimeExist.animes) {
+      if (!doesTheAnimeExist.animes === null) {
         return { message: "The anime does not exist" };
       }
-      const episodes = await database.sql`SELECT * FROM Episodes WHERE anime_id=${this.animeId}`;
+      const episodes = await dbClient.collection("episodes").find({animeId:new ObjectId(this.animeId)}).toArray()
       return {message:"success",episodes:episodes}
     
+
     }catch (error:any) {
       return{message:"An error has occurred while getting the episodes", error:error.message}
     }

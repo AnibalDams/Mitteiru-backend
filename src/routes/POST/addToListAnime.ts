@@ -3,9 +3,9 @@ import type {Response, Request} from 'express'
 
 export default async function addAnimeToList(req:Request, res:Response){
     try {
-        const animeId = Number(req.params.animeId)
-        const listId = Number(req.params.listId)
-        const addAnimeToList =await new AnimeInList(0,animeId,listId,0).addToList()
+        const animeId = req.params.animeId
+        const listId = req.params.listId
+        const addAnimeToList =await new AnimeInList("",animeId,listId,"").addToList()
         switch(addAnimeToList.message){
             case "success":
                 res.statusCode = 201

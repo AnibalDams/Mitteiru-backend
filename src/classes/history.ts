@@ -1,19 +1,22 @@
+import { ObjectId } from "mongodb";
 import database from "../libs/db";
+import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 import moment from "moment";
+import { Anime } from "./animes";
 export default class History {
-  id: number;
-  animeId: number;
+  id: string;
+  animeId: string;
   episodeNumber: number;
-  profileId: number;
+  profileId: string;
   date: number;
 
   constructor(
-    id: number,
-    animeId: number,
+    id: string,
+    animeId: string,
     episodeNumber: number,
     date: number,
-    profileId: number
+    profileId: string
   ) {
     this.id = id;
     this.animeId = animeId;
@@ -27,25 +30,24 @@ export default class History {
       const today = new Date().getTime();
       const todayString = new Date(today).toISOString().substring(0, 10);
 
-      const isThereAnime: any = await database
-        .sql
-          `SELECT id, date FROM History WHERE anime_id = ${this.animeId} AND profile_id=${this.profileId}`
-        
-      const dates: any = {};
-      for (let i = 0; i < isThereAnime.length; i++) {
-        const anime = isThereAnime[i];
-        const animeDate = new Date(anime.date).toISOString().substring(0, 10);
-        dates[animeDate] = animeDate;
-      }
-      if (!dates[todayString]) {
-        await database
-          .sql
-            `INSERT INTO history (anime_id, episode_number, date, profile_id) VALUES(${this.animeId}, ${this.episodeNumber},${today},${this.profileId})`
-          
-      }
+      const isThereAnime: any = await dbClient.collection("history").find({profileId:new ObjectId(this.profileId), animeId:new ObjectId(this.animeId)}).toArray()
+
+        const dates: any = {};
+        for (let i = 0; i < isThereAnime.length; i++) {
+          const anime = isThereAnime[i];
+          const animeDate = new Date(anime.date).toISOString().substring(0, 10);
+          dates[animeDate] = animeDate;
+        }
+        if (!dates[todayString]) {
+          await dbClient.collection("history").insertOne({animeId:new ObjectId(this.animeId),episodeNumber:this.episodeNumber,date:today,profileId:new ObjectId(this.profileId)})
+  
+            
+        }
+      
 
       return { message: "Success" };
     } catch (error: any) {
+      console.error(error)
       return {
         message: "An error has occurred while adding the History",
         error: error.message,
@@ -55,10 +57,17 @@ export default class History {
 
   async get():Promise< ReturnData> {
     try {
-      const history = await database
-        .sql
-          `SELECT Animes.id, Animes.name,Animes.japanese_name, Animes.release_year,Animes.studio,Animes.cover, History.date FROM History INNER JOIN Animes ON Animes.id = History.anime_id WHERE profile_id = ${this.profileId} ORDER BY History.date DESC`
+      const getHistory = await dbClient.collection("history").find({profileId: new ObjectId(this.profileId)}).sort({date:-1}).toArray()
+
+      const history:any = [];
         
+      if (getHistory.length > 0) {
+        for (let i = 0; i < getHistory.length; i++) {
+          const animeH = getHistory[i];
+          const anime = await new Anime(animeH.animeId).getById()
+          history.push({date:animeH.date,...anime.animes})
+        }
+      }  
       const dates: any = [];
       for (let i = 0; i < history.length; i++) {
         const log: any = history[i];

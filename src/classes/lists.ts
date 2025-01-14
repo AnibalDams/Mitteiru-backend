@@ -1,12 +1,14 @@
+import { ObjectId } from "mongodb";
 import database from "../libs/db";
+import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 
 export default class List {
-  id: number;
+  id: string;
   name: string;
-  profileId: number;
+  profileId: string;
 
-  constructor(id: number, name: string, profileId: number) {
+  constructor(id: string, name: string, profileId: string) {
     this.id = id;
     this.name = name;
     this.profileId = profileId;
@@ -14,13 +16,11 @@ export default class List {
 
   async new(): Promise<ReturnData> {
     try {
-      const verifyProfile =
-        await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
-        console.log(this.profileId)
-      if (!verifyProfile[0]) {
+      const verifyProfile =await dbClient.collection("profiles").findOne({_id:new ObjectId(this.profileId)});
+      if (verifyProfile == null) {
         return { message: "profile not found" };
       }
-      await database.sql`INSERT INTO Lists (name, profile_id) VALUES(${this.name}, ${this.profileId})`;
+      await dbClient.collection("lists").insertOne({name:this.name, profileId:new ObjectId(this.profileId)})
       return { message: "Success" };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
@@ -29,11 +29,11 @@ export default class List {
 
   async getAll(): Promise<ReturnData> {
     try {
-      const verifyProfile = await database.sql`SELECT id FROM Profiles WHERE id=${this.profileId}`;
-      if (!verifyProfile[0]) {
+      const verifyProfile =await dbClient.collection("profiles").findOne({_id:new ObjectId(this.profileId)});
+      if (verifyProfile == null) {
         return { message: "Profile not found" };
       }
-      const all = await database.sql`SELECT * FROM Lists WHERE profile_id=${this.profileId}`;
+      const all = await dbClient.collection("lists").find({profileId:new ObjectId(this.profileId)}).toArray();
       return { message: "Success", lists: all };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };

@@ -3,9 +3,9 @@ import type { Response, Request } from "express";
 
 export default async function newList(req: Request, res: Response) {
   try {
-    const profileId = Number(req.params.profileId);
+    const profileId = req.params.profileId;
     const { name } = req.body;
-    const newList = await new List(0, name, profileId).new();
+    const newList = await new List("", name, profileId).new();
     switch (newList.message) {
       case "profile not found":
         res.statusCode = 404;

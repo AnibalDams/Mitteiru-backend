@@ -8,7 +8,11 @@ export default async function signUp(req: Request, res: Response) {
     const getUser =await user.login();
 
     switch (getUser.message) {
-      case "Invalid Email/Password":
+      case "Invalid Email":
+        res.statusCode = 200;
+        res.json(getUser);
+        break;
+      case "Invalid Password":
         res.statusCode = 200;
         res.json(getUser);
         break;

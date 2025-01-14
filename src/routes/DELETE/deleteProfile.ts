@@ -3,7 +3,7 @@ import type { Response, Request } from "express";
 
 export default async function defaultProfile(req: Request, res: Response) {
   try {
-    const profileId = Number(req.params.profileId);
+    const profileId = req.params.profileId;
     const deleteProfile = await new Profile(profileId).delete();
     switch (deleteProfile.message) {
       case "success":

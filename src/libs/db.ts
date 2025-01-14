@@ -1,6 +1,26 @@
-//import {Database} from "bun:sqlite"
-import {Database} from '@sqlitecloud/drivers'
+import { MongoClient, ServerApiVersion } from 'mongodb';
+const uri:any = process.env.DATABASE;
 
+const client = new MongoClient(uri, {
+  
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+    
+    
+  },
+});
 
-const database = new Database("sqlitecloud://nxyx0mkihk.sqlite.cloud:8860/db.sqlite?apikey=49GbSAn6kBG5RoH6wOeTHHv4sZRTyNDRCUlaPU7tYSQ")
-export default database
+export default async function run() {
+  try {
+
+    await client.connect();
+
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+
+    await client.close();
+  }
+}

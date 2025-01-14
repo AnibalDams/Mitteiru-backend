@@ -3,8 +3,8 @@ import type {Response, Request} from 'express'
 
 export default async function getAnimesInList(req:Request, res:Response){
     try {
-        const profileId = Number(req.params.profileId)
-        const animes = await new AnimesInList(0,0,0,profileId).getAll()
+        const profileId =req.params.profileId
+        const animes = await new AnimesInList("","","",profileId).getAll()
         switch(animes.message){
             case "success":
                 res.statusCode = 200

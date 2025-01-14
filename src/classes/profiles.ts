@@ -1,17 +1,19 @@
+import { ObjectId } from "mongodb";
 import database from "../libs/db";
+import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 import List from "./lists";
 export default class Profile {
-  id: number;
+  id: string;
   name: string;
   photo: string;
-  userId: number;
+  userId: string;
 
   constructor(
-    id: number = 0,
+    id: string = "",
     name: string = "",
     photo: string = "",
-    userId: number = 0
+    userId: string = ""
   ) {
     this.id = id;
     this.name = name;
@@ -22,18 +24,19 @@ export default class Profile {
   async new():Promise< ReturnData> {
     const defaultLists = ["Watching", "Completed", "Planning", "Paused", "Dropped"]
     try {
-      const verifyUser = await database
-        .sql`SELECT id FROM User WHERE id = ${this.userId}`
-      if (!verifyUser[0]) {
+      const verifyUser = await dbClient.collection("user").findOne({_id: new ObjectId(this.userId)})
+      if (verifyUser == null) {
         return { message: "User not found" };
       }
-      await database.sql
-      `INSERT INTO Profiles(name, photo, user_id) VALUES(${this.name},${this.photo},${this.userId})`
-    ;
-      const profile:any = await database.sql`SELECT last_insert_rowid() as id`;
+      const newProfile = await dbClient.collection("profiles").insertOne({
+        name:this.name,
+        photo:this.photo,
+        userId:new ObjectId(this.userId)
+      })
+      const profileId:any = newProfile.insertedId.toString();
       for (let i = 0; i < defaultLists.length; i++) {
         const listName = defaultLists[i];
-        const list = new List(0,listName,profile[0].id)
+        const list = new List("",listName,profileId)
         await list.new()        
       }
 
@@ -49,12 +52,11 @@ export default class Profile {
   async getAll():Promise< ReturnData> {
 
     try {
-      const verifyUser =await database.sql`SELECT id FROM User WHERE id = ${this.userId}`
-      if (!verifyUser[0]) {
+      const verifyUser = await dbClient.collection("user").findOne({_id: new ObjectId(this.userId)})
+      if (verifyUser == null) {
         return { message: "User not found" };
       }
-      const allProfiles = await database.sql
-      `SELECT * FROM Profiles WHERE user_id = ${this.userId}`
+      const allProfiles = await dbClient.collection("profiles").find({userId: new ObjectId(this.userId)}).toArray()
     ;
       return { message: "success", profiles: allProfiles };
     } catch (error: any) {
@@ -67,7 +69,8 @@ export default class Profile {
 
   async delete():Promise<ReturnData>{
     try {
-      await database.sql`DELETE FROM Profiles WHERE id=${this.id}`
+      console.log(this.id)
+      await dbClient.collection("profiles").findOneAndDelete({_id:new ObjectId(this.id)})
       return {message: "success"}
     } catch (error:any) {
       return {message: "An error has occurred while deleting the profile", error: error.message}
@@ -76,7 +79,10 @@ export default class Profile {
 
   async update():Promise<ReturnData>{
     try {
-      database.sql`UPDATE Profiles SET name=${this.name},photo=${this.photo} WHERE id=${this.id}`
+      await dbClient.collection("profiles").findOneAndUpdate({_id:new ObjectId(this.id)},{$set:{
+        name:this.name,
+        photo:this.photo
+      }})
       return {message:"success"}
     } catch (error:any) {
       return {message: "An error has occurred while updating the profile", error: error.message}

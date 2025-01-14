@@ -1,9 +1,10 @@
-import database from "../libs/db";
+import { ObjectId } from "mongodb";
+import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 import getRandomInt from "../libs/randomNumber";
 import Genre from "./genres";
 export class Anime {
-  id: number;
+  id: string;
   name: string;
   japaneseName: string;
   synopsis: string;
@@ -15,7 +16,7 @@ export class Anime {
   horizontalImage: string;
   genres: string[];
   public constructor(
-    id: number = 0,
+    id: string = "",
     name: string = "",
     japaneseName: string = "",
     synopsis: string = "",
@@ -40,57 +41,74 @@ export class Anime {
     this.genres = genres;
   }
   async new(): Promise<ReturnData> {
-   
     try {
-      const verifyAnime =await database
-        .sql`
-        SELECT id FROM Animes WHERE name=${this.name}`
-        
-      if (verifyAnime) {
-        database
-          .sql
-            `
-            UPDATE Animes SET name=${this.name},japanese_name=${this.japaneseName},synopsis=${this.synopsis},release_year=${this.releaseYear},studio=${this.studio},cover=${this.cover},image=${this.image},horizontal_image=${this.horizontalImage},on_going=${this.onGoing} WHERE name=${this.name}`
-          
+      const verifyAnime = await dbClient
+        .collection("anime")
+        .findOne({ name: this.name });
+
+      if (verifyAnime != null) {
+        dbClient.collection("anime").findOneAndUpdate(
+          { name: this.name },
+          {
+            $set: {
+              name: this.name,
+              japaneseName: this.japaneseName,
+              synopsis: this.synopsis,
+              releaseYear: this.releaseYear,
+              studio: this.studio,
+              cover: this.cover,
+              image: this.image,
+              horizontalImage: this.horizontalImage,
+              onGoing: this.onGoing,
+            },
+          }
+        );
+
         console.log("anime updated");
         return {
           message: "The anime has been created successfully",
         };
       }
-      await database.sql`
-        INSERT INTO Animes(name,japanese_name,synopsis,release_year,studio,cover,image,horizontal_image,on_going,views_) VALUES(${this.name},${this.japaneseName},${this.synopsis},${this.releaseYear},${this.studio},${this.cover},${this.image},${this.horizontalImage},${this.onGoing},0)`;
-        
-      const getAnimeId =  await database.sql`
-      USE DATABASE db.sqlite;
-      SELECT id FROM Animes WHERE name=${this.name}
-      
-      `;
-      const animeId = getAnimeId[0].id;
+      const newAnime = await dbClient.collection("anime").insertOne({
+        name: this.name,
+        japaneseName: this.japaneseName,
+        synopsis: this.synopsis,
+        releaseYear: this.releaseYear,
+        studio: this.studio,
+        cover: this.cover,
+        image: this.image,
+        horizontalImage: this.horizontalImage,
+        onGoing: this.onGoing,
+        genres: this.genres,
+        createdAt: new Date().getTime(),
+        views: 0,
+        likes:0
+      });
 
+      const animeId = newAnime.insertedId;
 
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
-        const doesTheGenreExist =await database.sql
-          `SELECT id FROM Genre WHERE name=${genre}`
-        ;
-   
-        if (doesTheGenreExist.length <= 0) {
-          await database
-            .sql`INSERT INTO Genre(name) VALUES (${genre})`
-            
-          await database
-            .sql`INSERT INTO Genres(name,anime_id) VALUES(${genre},${animeId})`
-            
+        const doesTheGenreExist = await dbClient
+          .collection("genres")
+          .findOne({ name: genre });
+        if (doesTheGenreExist == null) {
+          await dbClient.collection("genres").insertOne({ name: genre });
+          await dbClient
+            .collection("genreAnime")
+            .insertOne({ name: genre, animeId: animeId });
         } else {
-          await database
-            .sql`INSERT INTO Genres(name,anime_id) VALUES(${genre},${animeId})`
-            
+          await dbClient
+            .collection("genreAnime")
+            .insertOne({ name: genre, animeId: animeId });
         }
       }
       return {
         message: "The anime has been created successfully",
       };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while creating an Anime",
         error: error.message,
@@ -98,13 +116,12 @@ export class Anime {
     }
   }
 
-  async getAll():Promise<ReturnData> {
+  async getAll(): Promise<ReturnData> {
     try {
-      const getAnimes =  await database.sql`
-      SELECT * FROM Animes ORDER BY Animes.id DESC`
-      const animes = await getAnimes
+      const animes = (await dbClient.collection("anime").find().toArray()).sort((a, b) => b.date - a.date);
       return { message: "animes found", animes: animes };
     } catch (error: any) {
+      console.log(error)
       return {
         message: "An error has occurred while getting animes",
         error: error.message,
@@ -112,48 +129,50 @@ export class Anime {
     }
   }
 
-  async getById():Promise<ReturnData> {
-
+  async getById(): Promise<ReturnData> {
     try {
-      const anime: any = await database.sql
-      `SELECT * from Animes WHERE id=${this.id}`;
-      const views = anime[0].views_ == null ? 0 : anime[0].views_ + 1;
-      if (anime[0] != null) {
-        await database
-          .sql`UPDATE Animes SET views_=${views} WHERE id=${anime[0].id}`
-          
+      const anime: any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+
+      if (anime != null) {
+        await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, {
+          $set: {
+            views: anime.views + 1
+          }
+        })
+
       }
-      const getGenres = anime[0]
-        ? await database
-            .sql`SELECT * FROM Genres WHERE anime_id=${anime[0].id}`
-        : [];
-      return { message: "anime found", animes: anime[0], genres: getGenres };
+
+      return { message: "anime found", animes: anime };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
-  async getAnimesOfAnStudio():Promise< ReturnData> {
+  async getAnimesOfAnStudio(): Promise<ReturnData> {
     try {
-      const animes = await database
-        .sql`SELECT * FROM Animes WHERE studio=${this.studio}`
+      const animes = (await (dbClient.collection("anime").find({ studio: this.studio }).toArray())).sort((a, b) => b.date - a.date)
       return { message: "success", animes: animes };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
- async getMostPopular(): Promise<ReturnData> {
+  async getMostPopular(): Promise<ReturnData> {
     try {
-      const animes = await database.sql
-      `SELECT * FROM Animes ORDER BY views_ DESC LIMIT 12`
-    ;
+      const animes = await dbClient.collection("anime").find().sort({ views: -1 }).limit(12).toArray()
+
       return { message: "success", animes: animes };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
@@ -161,105 +180,102 @@ export class Anime {
     }
   }
 
-async  getSimilar():Promise< ReturnData> {
+  async getSimilar(): Promise<ReturnData> {
     try {
-      const genres =await database
-        .sql`SELECT * FROM Genres WHERE anime_id=${this.id}`
-      if (genres.length == 0) {
-        return { message: "no genres found" };
+      const animeG: any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+
+      if (animeG === null) {
+        return { message: "no anime found" };
       }
-      const randomNumber = getRandomInt(0, genres ? genres.length - 1 : 1);
+      const randomNumber = getRandomInt(0, animeG.genres.length - 1);
       const animes: any[] = [];
-      const allAnimes =await new Genre(
-        0,
-        genres ? genres[randomNumber].name : ""
+      const allAnimes = await new Genre(
+        "",
+        animeG.genres[randomNumber]
       ).getAnimes();
 
       for (let i = 0; i < allAnimes.animes.length; i++) {
         const anime = allAnimes.animes[i];
 
-        if (anime.id != this.id) {
+        if (anime._id.toString() != this.id) {
           animes.push(anime);
         }
       }
       return { message: "success", animes: animes };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the similar Animes",
         error: error.message,
       };
     }
   }
-  async getAnimesOfAYear():Promise< ReturnData> {
+  async getAnimesOfAYear(): Promise<ReturnData> {
     try {
-      const animes = await database
-        .sql`SELECT * FROM Animes WHERE release_year=${this.releaseYear}`
+      const animes = await dbClient.collection("anime").find({ releaseYear: this.releaseYear }).toArray()
       return { message: "Success", animes: animes };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
-  async addLike(profileId: number): Promise<ReturnData> {
+  async addLike(profileId: string): Promise<ReturnData> {
     try {
       console.log("Function started");
       console.log("Verifying like");
-      const verifyLike = await database
-        .sql
-          `SELECT * FROM Likes WHERE profile_id=${profileId} AND anime_id=${this.id}`
-        
-       
+      const anime = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+      const verifyLike = await dbClient.collection("likes").findOne({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
+
 
       console.log("Done");
-      if (verifyLike[0]) {
+      if (verifyLike != null) {
         console.log("There is a like, deleting it");
-        await database
-          .sql
-            `DELETE FROM Likes WHERE profile_id=${profileId} AND anime_id=${this.id}`
-          
+        await dbClient.collection("likes").findOneAndDelete({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
+        await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, { $set: { likes: anime?.likes - 1 } })
 
         return { message: "success 1" };
       }
       console.log("There is no like, adding");
-     await database
-        .sql
-          `INSERT INTO Likes(anime_id, profile_id) VALUES(${this.id},${profileId})`
-        
+      await dbClient.collection("likes").insertOne({ animeId: new ObjectId(this.id), profileId: new ObjectId(profileId) })
+      await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, { $set: { likes: anime?.likes + 1 } })
+
 
       console.log("done");
       return { message: "success 2" };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while adding the like",
         error: error.message,
       };
     }
   }
-  async getLikes():Promise< ReturnData> {
+  async getLikes(): Promise<ReturnData> {
     try {
-      const likes = await database
-        .sql`SELECT profile_id FROM Likes WHERE anime_id=${this.id}`
-      return { message: "Success", likesCount: likes.length, profiles: likes };
+      const anime:any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+      const profilesLiked = await dbClient.collection("likes").find({ animeId: new ObjectId(this.id) }).toArray()
+
+      return { message: "Success", likesCount:  anime.likes, profiles: profilesLiked };
     } catch (error: any) {
+      console.error(error)
+
       return { message: "An error has occurred", error: error.message };
     }
   }
-  async getMostLiked():Promise< ReturnData> {
+  async getMostLiked(): Promise<ReturnData> {
     try {
-      const mostLikedAnimes =await database.sql`
-        SELECT Animes.*, COUNT(Likes.anime_id) AS like_count
-        FROM Animes
-        LEFT JOIN Likes ON Animes.id = Likes.anime_id
-        GROUP BY Animes.id
-        ORDER BY like_count DESC
-        LIMIT 12; 
-      `;
-
+      const mostLikedAnimes = (await dbClient.collection("anime").find().toArray()).sort((a,b)=>b.likes-a.likes)
 
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
+      console.error(error)
+
       return {
         message: "An error has occurred while getting the most liked animes",
         error: error.message,

@@ -4,7 +4,7 @@ import type { Response, Request } from "express";
 export default async function getAnimeOfAyear(req: Request, res: Response) {
   try {
     const year = req.params.year;
-    const animes =await new Anime(0, "", "", "", year).getAnimesOfAYear();
+    const animes =await new Anime("", "", "", "", year).getAnimesOfAYear();
     switch (animes.message) {
       case "Success":
         res.statusCode = 200;

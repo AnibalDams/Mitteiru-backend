@@ -4,9 +4,9 @@ import type {Response, Request} from 'express'
 export default async function updateProfile(req:Request, res:Response){
 
     try {
-        const profileId = Number(req.params.profileId)
+        const profileId = req.params.profileId
         const {name,photo} = req.body
-        const update = await new Profile(profileId,name,photo,0).update()
+        const update = await new Profile(profileId,name,photo,"").update()
         switch(update.message){
             case "success":
                 res.statusCode = 200

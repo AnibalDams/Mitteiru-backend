@@ -3,9 +3,9 @@ import type { Response, Request } from "express";
 
 export default async function removeAnimeFromList(req: Request, res: Response) {
   try {
-    const animeId = Number(req.params.animeId);
-    const listId = Number(req.params.listId);
-    const removeAnime =await new AnimeInList(0, animeId, listId, 0).removeFromList();
+    const animeId = req.params.animeId;
+    const listId = req.params.listId;
+    const removeAnime =await new AnimeInList("", animeId, listId, "").removeFromList();
     switch (removeAnime.message) {
       case "success":
         res.statusCode = 200;

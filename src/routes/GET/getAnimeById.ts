@@ -5,7 +5,7 @@ import type { Response, Request } from "express";
 
 export default async function getByAnimeById(req: Request, res: Response){
     try{
-        const animeId = Number(req.params.animeId)
+        const animeId =req.params.animeId
         const anime = new Anime(animeId)
         const getByAnimeById =await anime.getById()
         switch (getByAnimeById.message) {

@@ -31,6 +31,7 @@ import removeAnimeFromList from "./DELETE/removeFromList";
 import deleteProfile from "./DELETE/deleteProfile"
 
 import updateProfile from "./PUT/updateProfile";
+import decodeToken from "./GET/decodeToken";
 
 const route = Router();
 
@@ -61,7 +62,7 @@ route.get("/", (req, res) => {
 
 
 
-
+route.get("/user/decode", decodeToken)
 
 // Animes Rotues
 route.get("/anime/:animeId", getAnimeById);

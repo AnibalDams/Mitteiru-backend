@@ -3,8 +3,8 @@ import type {Response, Request} from 'express'
 
 export default async function addLikeToAnime(req:Request, res:Response){
     try {
-        const animeId = Number(req.params.animeId)
-        const profileId = Number(req.params.profileId)
+        const animeId = req.params.animeId
+        const profileId = req.params.profileId
         const addLike =await new Anime(animeId).addLike(profileId)
         switch(addLike.message){
             case "success 1":

@@ -3,7 +3,7 @@ import type { Response, Request } from "express";
 
 export default async function getLists(req: Request, res: Response) {
   try {
-    const profileId = Number(req.params.profileId);
+    const profileId = req.params.profileId;
     const allLists = await new List(0, "", profileId).getAll();
     switch (allLists.message) {
       case "Profile not found":
