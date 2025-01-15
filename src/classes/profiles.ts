@@ -69,7 +69,6 @@ export default class Profile {
 
   async delete():Promise<ReturnData>{
     try {
-      console.log(this.id)
       await dbClient.collection("profiles").findOneAndDelete({_id:new ObjectId(this.id)})
       return {message: "success"}
     } catch (error:any) {
@@ -79,12 +78,14 @@ export default class Profile {
 
   async update():Promise<ReturnData>{
     try {
+      console.log(this.id)
       await dbClient.collection("profiles").findOneAndUpdate({_id:new ObjectId(this.id)},{$set:{
         name:this.name,
         photo:this.photo
       }})
       return {message:"success"}
     } catch (error:any) {
+      console.log(error)
       return {message: "An error has occurred while updating the profile", error: error.message}
     }
   }
