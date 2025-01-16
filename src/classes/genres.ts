@@ -16,7 +16,7 @@ export default class Genre {
   async getAll(): Promise<ReturnData> {
     try {
 
-      const genres = (await dbClient.collection("genres").find().toArray()).sort((a,b)=>b.name - a.name)
+      const genres = (await dbClient.collection("genres").find().sort({name:1}).toArray())
       return { message: "Success", genres: genres };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
