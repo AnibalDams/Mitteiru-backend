@@ -32,6 +32,9 @@ import deleteProfile from "./DELETE/deleteProfile"
 
 import updateProfile from "./PUT/updateProfile";
 import decodeToken from "./GET/decodeToken";
+import addReview from "./POST/addReview";
+import getReviews from "./GET/getAllReviews";
+import getReviewById from "./GET/getReviewById";
 
 const route = Router();
 
@@ -75,6 +78,8 @@ route.get("/anime/:animeId/similar", getSimilarAnimes);
 route.get("/anime/:animeId/likes/count",getLikes)
 route.get("/anime/genre/:genre", getAnimesOfAGenre)
 route.get("/anime/genre/d/all", getAllGenres)
+route.get("/anime/:animeId/review/all", getReviews)
+route.get("/anime/:animeId/review/:reviewId", getReviewById)
 
 
 // Episodes Routes
@@ -95,6 +100,7 @@ route.get("/user/profile/:profileId/list/anime/all", getAnimesInList);
 // Animes Routes
 route.post("/anime/new", newAnime);
 route.post("/anime/:animeId/like/:profileId", addLikeToAnime);
+route.post("/anime/:animeId/review/new", addReview)
 
 // Episodes Routes
 route.post("/anime/:animeId/episode/new", addEpisode);

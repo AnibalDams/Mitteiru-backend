@@ -284,4 +284,30 @@ export class Anime {
       };
     }
   }
+  async addReview(review:string, title:string,profileId:string, profileName:string, profileImage:string):Promise<ReturnData>{
+    try {
+      await dbClient.collection("reviews").insertOne({review:review, animeId:this.id, title, profileId, profileName, profileImage,createdAt:new Date().getTime()})
+      return {message:"Success"}
+    } catch (error:any) {
+      console.error(error)
+      return {message:"There was an error while adding the review", error:error.message}
+    }
+  }
+
+  async getAllReviews():Promise<ReturnData>{
+    try {
+      const reviews = await dbClient.collection("reviews").find({animeId:this.id}).sort({createdAt:-1}).toArray()
+      return {message:"Success", reviews:reviews}
+    } catch (error:any) {
+      return {message:"There was an error while getting the reviews", error:error.message}
+    }
+  }
+  async getReviewById(reviewId:string):Promise<ReturnData>{
+    try {
+      const review = await dbClient.collection("reviews").findOne({animeId:this.id,_id:new ObjectId(reviewId)})
+      return {message:"Success", reviews:review}
+    } catch (error:any) {
+      return {message:"There was an error while getting the review", error:error.message}
+    }
+  }
 }
