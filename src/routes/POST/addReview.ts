@@ -5,7 +5,7 @@ import { Anime } from '../../classes/animes'
 export default async function addReview(req:Request, res:Response) {
     try {
         const animeId = req.params.animeId
-        const {review, profileId, profileName, profileImage,title} = req.body.review
+        const {review, profileId, profileName, profileImage,title} = req.body
         const addReview = await new Anime(animeId).addReview(review,title,profileId, profileName, profileImage)
         switch(addReview.message){
             case "Success":
