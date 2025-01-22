@@ -78,7 +78,6 @@ export default class Profile {
 
   async update():Promise<ReturnData>{
     try {
-      console.log(this.id)
       await dbClient.collection("profiles").findOneAndUpdate({_id:new ObjectId(this.id)},{$set:{
         name:this.name,
         photo:this.photo

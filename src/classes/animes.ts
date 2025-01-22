@@ -226,8 +226,7 @@ export class Anime {
   }
   async addLike(profileId: string): Promise<ReturnData> {
     try {
-      console.log(profileId)
-      console.log(this.id)
+
       console.log("Function started");
       console.log("Verifying like");
       const anime = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
