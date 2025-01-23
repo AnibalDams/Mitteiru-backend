@@ -131,16 +131,13 @@ export class Anime {
 
   async getById(): Promise<ReturnData> {
     try {
-      const anime: any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+      const anime: any = await dbClient.collection("anime").findOneAndUpdate(
+        { _id: new ObjectId(this.id) },
+        { $inc: { views: 1 } },
+        { returnDocument: "after" }
+      );
 
-      if (anime != null) {
-        await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, {
-          $set: {
-            views: anime.views + 1
-          }
-        })
-
-      }
+    
 
       return { message: "anime found", animes: anime };
     } catch (error: any) {
