@@ -301,6 +301,9 @@ export class Anime {
   async getReviewById(reviewId:string):Promise<ReturnData>{
     try {
       const review = await dbClient.collection("reviews").findOne({animeId:this.id,_id:new ObjectId(reviewId)})
+      if (review==null) {
+        return {message:"Review not found"}
+      }
       return {message:"Success", reviews:review}
     } catch (error:any) {
       return {message:"There was an error while getting the review", error:error.message}

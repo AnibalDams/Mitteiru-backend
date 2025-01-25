@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
-const uri:any = process.env.DATABASE;
+const uri:any = "mongodb+srv://dams:dams@cluster0.fvwbh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const client = new MongoClient(uri, {
   

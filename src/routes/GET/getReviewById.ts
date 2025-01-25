@@ -11,6 +11,10 @@ export default async function getReviewById(req: Request, res: Response) {
         res.statusCode = 200
         res.json(getReview);
         break;
+      case "Review not found":
+        res.statusCode = 404
+        res.json(getReview)
+        break
       case "There was an error while getting the review":
         res.statusCode = 500
         res.json(getReview);
