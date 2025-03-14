@@ -89,4 +89,36 @@ export default class Episode {
       return{message:"An error has occurred while getting the episodes", error:error.message}
     }
   }
+  async newComment(profileId:string, content:string, profileName:string, profileImage:string):Promise<ReturnData>{
+    try{
+      const episode = await dbClient.collection("episodes").findOne({_id:new ObjectId(this.id)})
+      if (!episode) {
+        return { message: "The episode does not exist" };
+      }
+      await dbClient.collection("comments").insertOne({
+        profileId:profileId,
+        content:content,
+        profileName:profileName,
+        profileImage:profileImage,
+        episodeId:new ObjectId(this.id)
+      })
+      return {message:"Comment added successfully"}
+      
+    }catch(error:any){
+      return{message:"An error has occurred while adding the comment", error:error.message}
+    }
+  }
+  async getComments():Promise<ReturnData>{
+    try{
+      const episode = await dbClient.collection("episodes").findOne({_id:new ObjectId(this.id)})
+      if (!episode) {
+        return { message: "The episode does not exist" };
+      }
+      const comments = await dbClient.collection("comments").find({episodeId:new ObjectId(this.id)}).toArray()
+      return {message:"success",comments:comments}
+      
+    }catch(error:any){
+      return{message:"An error has occurred while getting the comments", error:error.message}
+    }
+  }
 }
