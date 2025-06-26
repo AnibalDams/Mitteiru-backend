@@ -17,4 +17,5 @@ export default interface ReturnData {
     lists?:List[]|unknown[]
     likesCount?:Number
     comments?:any
+    commentsLikes?:any
   }

@@ -27,6 +27,7 @@ import addToHistory from "./POST/addToHistory";         // Añade un episodio al
 import newComment from "./POST/newComment";             // Publica un nuevo comentario.
 import addLikeToAnime from "./POST/addLike";            // Agrega un "like" a un anime.
 import addReview from "./POST/addReview";               // Crea una reseña para un anime.
+import addLikeToComment from "./POST/addLikeToComment"; // Agrega un "like" a un comentario.
 
 // ---------------------------
 // Importación de módulos GET
@@ -49,6 +50,7 @@ import getAnimesWithMostLikes from "./GET/getAnimesWithMostLikes"; // Lista los 
 import getReviews from "./GET/getAllReviews";                  // Obtiene todas las reseñas de un anime.
 import getReviewById from "./GET/getReviewById";               // Obtiene una reseña específica de un anime.
 import decodeToken from "./GET/decodeToken";                   // Decodifica el token del usuario.
+import getCommentLikes from "./GET/getCommentLikes";           // Obtiene tanto el conteo de likes de un episodio, y los perfiles que le han dado like
 
 // ------------------------------
 // Importación de módulos DELETE
@@ -128,6 +130,9 @@ route.get("/anime/:animeId/episode/all", getEpisodes);
 // Obtener todos los comentarios de un episodio.
 route.get("/anime/episode/:episodeId/comment/all", getComments);
 
+// Obtiene los likes de un episodio
+route.get("/anime/episode/:episodeId/comment/likes/all", getCommentLikes)
+
 // -------------------------------
 // Rutas de Perfiles (GET)
 // -------------------------------
@@ -168,6 +173,9 @@ route.post("/anime/:animeId/episode/new", addEpisode);
 
 // Crear un nuevo comentario para un episodio.
 route.post("/anime/episode/:episodeId/comment/new", newComment);
+
+// Agregar un "like" a un comentario.
+ route.post("/anime/episode/:episodeId/comment/:commentId/like/:profileId", addLikeToComment);
 
 // --- Operaciones sobre Usuarios ---
 // Registro de un nuevo usuario.
