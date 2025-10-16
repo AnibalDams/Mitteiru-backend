@@ -1,10 +1,14 @@
 import express, { json,urlencoded } from "express";
-import path from 'path'
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import cors from "cors";
 import routes from './src/routes/index.routes'
 import dbConnection from './src/libs/db'
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middlewares
 
@@ -18,15 +22,7 @@ app.use(json());
 
 app.use(routes);
 
-app.get('/download', (req, res) => {
-    const file = path.join(__dirname, 'db.sqlite'); // Cambia 'ruta/al/archivo.txt' por la ruta de tu archivo
-    res.download(file, (err) => {
-        if (err) {
-            console.error('Error al descargar el archivo:', err);
-            res.status(500).send('Error al descargar el archivo');
-        }
-    });
-  });
+
   
 
 app.listen(process.env.PORT,async ()=>{
@@ -35,6 +31,6 @@ app.listen(process.env.PORT,async ()=>{
 })
 
 // Archivos estaticos
-app.use("/static", express.static(path.join(__dirname + "./static")));
+app.use("/static", express.static(path.join(__dirname, "static")));
 
 
