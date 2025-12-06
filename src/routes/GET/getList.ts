@@ -4,7 +4,7 @@ import type { Response, Request } from "express";
 export default async function getLists(req: Request, res: Response) {
   try {
     const profileId = req.params.profileId;
-    const allLists = await new List(0, "", profileId).getAll();
+    const allLists = await new List("", "", profileId).getAll();
     switch (allLists.message) {
       case "Profile not found":
         res.statusCode = 404;
