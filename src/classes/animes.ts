@@ -64,7 +64,6 @@ export class Anime {
           }
         );
 
-        console.log("anime updated");
         return {
           message: "The anime has been created successfully",
         };
@@ -224,26 +223,20 @@ export class Anime {
   async addLike(profileId: string): Promise<ReturnData> {
     try {
 
-      console.log("Function started");
-      console.log("Verifying like");
       const anime = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
       const verifyLike = await dbClient.collection("likes").findOne({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
   
 
-      console.log("Done");
       if (verifyLike != null) {
-        console.log("There is a like, deleting it");
         await dbClient.collection("likes").findOneAndDelete({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
         await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, { $set: { likes: anime?.likes - 1 } })
 
         return { message: "success 1" };
       }
-      console.log("There is no like, adding");
       await dbClient.collection("likes").insertOne({ animeId: new ObjectId(this.id), profileId: new ObjectId(profileId) })
       await dbClient.collection("anime").findOneAndUpdate({ _id: new ObjectId(this.id) }, { $set: { likes: anime?.likes + 1 } })
 
 
-      console.log("done");
       return { message: "success 2" };
     } catch (error: any) {
       console.error(error)

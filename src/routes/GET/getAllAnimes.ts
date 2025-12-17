@@ -4,6 +4,7 @@ import type { Response, Request } from "express";
 export default async function getAnimes(req: Request, res: Response) {
   try {
     const getAllAnimes = await new Anime().getAll();
+
     switch (getAllAnimes.message) {
       case "animes found":
         res.statusCode = 200

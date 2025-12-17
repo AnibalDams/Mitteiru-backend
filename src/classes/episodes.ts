@@ -3,6 +3,7 @@ import dbClient from "../libs/dbClient";
 import { Anime } from "./animes";
 import type ReturnData from "../libs/types/returnData";
 import { MongoDBCollectionNamespace, ObjectId } from "mongodb";
+import externalCheck from "../libs/externalChecker";
 
 export default class Episode {
   id: string;
@@ -33,6 +34,9 @@ export default class Episode {
 
   async new(): Promise<ReturnData> {
     try {
+      let type = this.link.split(".")[this.link.split(".").length - 1];
+      let externalVideo = externalCheck(type)
+      
       const doesTheAnimeExist = await new Anime(this.animeId).getById();
 
       if (!doesTheAnimeExist.animes === null) {
@@ -54,13 +58,15 @@ export default class Episode {
                 synopsis: this.synopsis,
                 thumbnail: this.thumbnail,
                 link: this.link,
+                external:externalVideo
+
               },
             }
           );
 
-          console.log("episode updated");
           return { message: "The episode was added to the anime" };
         }
+
         await dbClient.collection("episodes").insertOne({
           name: this.name,
           synopsis: this.synopsis,
@@ -68,6 +74,7 @@ export default class Episode {
           link: this.link,
           animeId: new ObjectId(this.animeId),
           episodeNumber: this.episodeNumber,
+          external:externalVideo
         });
 
         return { message: "The episode was added to the anime" };
