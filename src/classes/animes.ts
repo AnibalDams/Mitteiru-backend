@@ -65,7 +65,7 @@ export class Anime {
         );
 
         return {
-          message: "The anime has been created successfully",
+          message: "The anime has been updated successfully",
         };
       }
       const newAnime = await dbClient.collection("anime").insertOne({
@@ -81,7 +81,7 @@ export class Anime {
         genres: this.genres,
         createdAt: new Date().getTime(),
         views: 0,
-        likes:0
+        likes: 0
       });
 
       const animeId = newAnime.insertedId;
@@ -117,7 +117,7 @@ export class Anime {
 
   async getAll(): Promise<ReturnData> {
     try {
-      const animes = (await dbClient.collection("anime").find().toArray()).sort((a, b) => b.date - a.date);
+      const animes = (await dbClient.collection("anime").find().limit(10).toArray()).sort((a, b) => b.date - a.date);
       return { message: "animes found", animes: animes };
     } catch (error: any) {
       console.log(error)
@@ -125,6 +125,15 @@ export class Anime {
         message: "An error has occurred while getting animes",
         error: error.message,
       };
+    }
+  }
+  static async getRandomAnime(): Promise<ReturnData> {
+    try {
+      const animes = await dbClient.collection("anime").find().toArray()
+      const randomNumber = getRandomInt(0, animes.length - 1);
+      return { message: "success", animes: animes[randomNumber] };
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
     }
   }
 
@@ -136,7 +145,7 @@ export class Anime {
         { returnDocument: "after" }
       );
 
-    
+
 
       return { message: "anime found", animes: anime };
     } catch (error: any) {
@@ -225,7 +234,7 @@ export class Anime {
 
       const anime = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
       const verifyLike = await dbClient.collection("likes").findOne({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
-  
+
 
       if (verifyLike != null) {
         await dbClient.collection("likes").findOneAndDelete({ profileId: new ObjectId(profileId), animeId: new ObjectId(this.id) })
@@ -249,10 +258,10 @@ export class Anime {
   }
   async getLikes(): Promise<ReturnData> {
     try {
-      const anime:any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
+      const anime: any = await dbClient.collection("anime").findOne({ _id: new ObjectId(this.id) })
       const profilesLiked = await dbClient.collection("likes").find({ animeId: new ObjectId(this.id) }).toArray()
 
-      return { message: "Success", likesCount:  anime.likes, profiles: profilesLiked };
+      return { message: "Success", likesCount: anime.likes, profiles: profilesLiked };
     } catch (error: any) {
       console.error(error)
 
@@ -261,7 +270,7 @@ export class Anime {
   }
   async getMostLiked(): Promise<ReturnData> {
     try {
-      const mostLikedAnimes = (await dbClient.collection("anime").find().toArray()).sort((a,b)=>b.likes-a.likes)
+      const mostLikedAnimes = (await dbClient.collection("anime").find().toArray()).sort((a, b) => b.likes - a.likes)
 
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
@@ -273,33 +282,33 @@ export class Anime {
       };
     }
   }
-  async addReview(review:string, title:string,profileId:string, profileName:string, profileImage:string):Promise<ReturnData>{
+  async addReview(review: string, title: string, profileId: string, profileName: string, profileImage: string): Promise<ReturnData> {
     try {
-      await dbClient.collection("reviews").insertOne({review:review, animeId:this.id, title, profileId, profileName, profileImage,createdAt:new Date().getTime()})
-      return {message:"Success"}
-    } catch (error:any) {
+      await dbClient.collection("reviews").insertOne({ review: review, animeId: this.id, title, profileId, profileName, profileImage, createdAt: new Date().getTime() })
+      return { message: "Success" }
+    } catch (error: any) {
       console.error(error)
-      return {message:"There was an error while adding the review", error:error.message}
+      return { message: "There was an error while adding the review", error: error.message }
     }
   }
 
-  async getAllReviews():Promise<ReturnData>{
+  async getAllReviews(): Promise<ReturnData> {
     try {
-      const reviews = await dbClient.collection("reviews").find({animeId:this.id}).sort({createdAt:-1}).toArray()
-      return {message:"Success", reviews:reviews}
-    } catch (error:any) {
-      return {message:"There was an error while getting the reviews", error:error.message}
+      const reviews = await dbClient.collection("reviews").find({ animeId: this.id }).sort({ createdAt: -1 }).toArray()
+      return { message: "Success", reviews: reviews }
+    } catch (error: any) {
+      return { message: "There was an error while getting the reviews", error: error.message }
     }
   }
-  async getReviewById(reviewId:string):Promise<ReturnData>{
+  async getReviewById(reviewId: string): Promise<ReturnData> {
     try {
-      const review = await dbClient.collection("reviews").findOne({animeId:this.id,_id:new ObjectId(reviewId)})
-      if (review==null) {
-        return {message:"Review not found"}
+      const review = await dbClient.collection("reviews").findOne({ animeId: this.id, _id: new ObjectId(reviewId) })
+      if (review == null) {
+        return { message: "Review not found" }
       }
-      return {message:"Success", reviews:review}
-    } catch (error:any) {
-      return {message:"There was an error while getting the review", error:error.message}
+      return { message: "Success", reviews: review }
+    } catch (error: any) {
+      return { message: "There was an error while getting the review", error: error.message }
     }
   }
 }

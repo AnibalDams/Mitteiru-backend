@@ -63,6 +63,7 @@ import deleteProfile from "./DELETE/deleteProfile";            // Elimina un per
 // ---------------------------
 import updateProfile from "./PUT/updateProfile";               // Actualiza información de un perfil.
 import getComments from "./GET/getComments";                   // Obtiene los comentarios de un episodio.
+import getRandomAnime from "./GET/getRandomAnime";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -89,6 +90,9 @@ route.get("/anime/:animeId", getAnimeById);
 // Obtener todos los animes.
 // Se utiliza "/d/" para rutas fijas, evitando conflicto con los parámetros.
 route.get("/anime/d/all", getAllAnimes);
+
+// Obtener un anime random
+route.get("/anime/d/random", getRandomAnime);
 
 // Obtener el anime más popular.
 route.get("/anime/d/mostPopular", getMostPopularAnime);
