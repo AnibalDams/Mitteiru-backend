@@ -64,6 +64,7 @@ import deleteProfile from "./DELETE/deleteProfile";            // Elimina un per
 import updateProfile from "./PUT/updateProfile";               // Actualiza información de un perfil.
 import getComments from "./GET/getComments";                   // Obtiene los comentarios de un episodio.
 import getRandomAnime from "./GET/getRandomAnime";
+import addCharacterToAnime from "./POST/addCharacter";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -180,6 +181,9 @@ route.post("/anime/episode/:episodeId/comment/new", newComment);
 
 // Agregar un "like" a un comentario.
  route.post("/anime/episode/:episodeId/comment/:commentId/like/:profileId", addLikeToComment);
+
+// Agregar un personaje al anime
+route.post("/anime/:animeId/character/new", addCharacterToAnime);
 
 // --- Operaciones sobre Usuarios ---
 // Registro de un nuevo usuario.

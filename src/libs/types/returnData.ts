@@ -1,3 +1,5 @@
+import type { Character } from "../../classes/interfaces/Character";
+
 interface List{
   id: number
   name: string
@@ -18,4 +20,5 @@ export default interface ReturnData {
     likesCount?:Number
     comments?:any
     commentsLikes?:any
+    characters?:Character|Character[]
   }
