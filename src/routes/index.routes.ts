@@ -16,55 +16,58 @@ import { htmlPage } from "../libs/page";
 // ---------------------------
 // Importación de módulos POST
 // ---------------------------
-import newAnime from "./POST/newAnime";               // Crea un nuevo anime.
-import addEpisode from "./POST/addEpisode";             // Agrega un episodio a un anime.
-import signUp from "./POST/signUp";                     // Registra un nuevo usuario.
-import login from "./POST/login";                       // Permite el inicio de sesión del usuario.
-import newProfile from "./POST/newProfile";             // Crea un nuevo perfil para un usuario.
-import newList from "./POST/newList";                   // Crea una nueva lista para un perfil.
-import addAnimeToList from "./POST/addToListAnime";     // Agrega un anime a una lista.
-import addToHistory from "./POST/addToHistory";         // Añade un episodio al historial de visualización.
-import newComment from "./POST/newComment";             // Publica un nuevo comentario.
-import addLikeToAnime from "./POST/addLike";            // Agrega un "like" a un anime.
-import addReview from "./POST/addReview";               // Crea una reseña para un anime.
+import newAnime from "./POST/newAnime"; // Crea un nuevo anime.
+import addEpisode from "./POST/addEpisode"; // Agrega un episodio a un anime.
+import signUp from "./POST/signUp"; // Registra un nuevo usuario.
+import login from "./POST/login"; // Permite el inicio de sesión del usuario.
+import newProfile from "./POST/newProfile"; // Crea un nuevo perfil para un usuario.
+import newList from "./POST/newList"; // Crea una nueva lista para un perfil.
+import addAnimeToList from "./POST/addToListAnime"; // Agrega un anime a una lista.
+import addToHistory from "./POST/addToHistory"; // Añade un episodio al historial de visualización.
+import newComment from "./POST/newComment"; // Publica un nuevo comentario.
+import addLikeToAnime from "./POST/addLike"; // Agrega un "like" a un anime.
+import addReview from "./POST/addReview"; // Crea una reseña para un anime.
 import addLikeToComment from "./POST/addLikeToComment"; // Agrega un "like" a un comentario.
+import addCharacterToAnime from "./POST/addCharacter"; // Agrega un personaje a un anime
 
 // ---------------------------
 // Importación de módulos GET
 // ---------------------------
-import getAllAnimes from "./GET/getAllAnimes";                 // Obtiene todos los animes.
-import getAnimeById from "./GET/getAnimeById";                 // Obtiene detalles de un anime específico.
-import getEpisodes from "./GET/getEpisodes";                   // Lista los episodios de un anime.
-import getMostPopularAnime from "./GET/getMostPopularAnime";   // Obtiene el anime más popular.
-import getSimilarAnimes from "./GET/getSimilarAnime";          // Lista animes similares.
-import getAllProfiles from "./GET/getAllProfiles";             // Lista todos los perfiles de usuario.
-import getLists from "./GET/getList";                          // Obtiene todas las listas de un perfil.
-import getAnimesInList from "./GET/getAnimesInList";           // Lista los animes de una lista específica.
-import getAnimesOfAGenre from "./GET/getAnimesOfAGenre";       // Obtiene animes de un género específico.
-import getAllGenres from "./GET/getAllGenres";                 // Obtiene todos los géneros de anime.
-import getAnimesOfAnStudio from "./GET/getAnimesOfAnStudio";   // Lista animes de un estudio específico.
-import getAnimeOfAyear from "./GET/getAnimesOfAYear";          // Obtiene animes de un año específico.
-import getHistory from "./GET/getHistory";                     // Muestra el historial de visualización de un perfil.
-import getLikes from "./GET/getrLikes";                        // Cuenta los "likes" de un anime.
+import getAllAnimes from "./GET/getAllAnimes"; // Obtiene todos los animes.
+import getAnimeById from "./GET/getAnimeById"; // Obtiene detalles de un anime específico.
+import getEpisodes from "./GET/getEpisodes"; // Lista los episodios de un anime.
+import getMostPopularAnime from "./GET/getMostPopularAnime"; // Obtiene el anime más popular.
+import getSimilarAnimes from "./GET/getSimilarAnime"; // Lista animes similares.
+import getAllProfiles from "./GET/getAllProfiles"; // Lista todos los perfiles de usuario.
+import getLists from "./GET/getList"; // Obtiene todas las listas de un perfil.
+import getAnimesInList from "./GET/getAnimesInList"; // Lista los animes de una lista específica.
+import getAnimesOfAGenre from "./GET/getAnimesOfAGenre"; // Obtiene animes de un género específico.
+import getAllGenres from "./GET/getAllGenres"; // Obtiene todos los géneros de anime.
+import getAnimesOfAnStudio from "./GET/getAnimesOfAnStudio"; // Lista animes de un estudio específico.
+import getAnimeOfAyear from "./GET/getAnimesOfAYear"; // Obtiene animes de un año específico.
+import getHistory from "./GET/getHistory"; // Muestra el historial de visualización de un perfil.
+import getLikes from "./GET/getrLikes"; // Cuenta los "likes" de un anime.
 import getAnimesWithMostLikes from "./GET/getAnimesWithMostLikes"; // Lista los animes con mayor cantidad de "likes".
-import getReviews from "./GET/getAllReviews";                  // Obtiene todas las reseñas de un anime.
-import getReviewById from "./GET/getReviewById";               // Obtiene una reseña específica de un anime.
-import decodeToken from "./GET/decodeToken";                   // Decodifica el token del usuario.
-import getCommentLikes from "./GET/getCommentLikes";           // Obtiene tanto el conteo de likes de un episodio, y los perfiles que le han dado like
+import getReviews from "./GET/getAllReviews"; // Obtiene todas las reseñas de un anime.
+import getReviewById from "./GET/getReviewById"; // Obtiene una reseña específica de un anime.
+import decodeToken from "./GET/decodeToken"; // Decodifica el token del usuario.
+import getCommentLikes from "./GET/getCommentLikes"; // Obtiene tanto el conteo de likes de un episodio, y los perfiles que le han dado like
+import getCharacterOfAnAnime from "./POST/getCharacters"; // Obtiene los personajes de un anime en especifico
+import getCharacterRelatedAnime from "./GET/getCharacterRelatedAnime"; // Obtiene los animes relacionados a un personaje
+import getCharacterById from "./GET/getCharacterById"; // Obtiene un personaje por su ID
 
 // ------------------------------
 // Importación de módulos DELETE
 // ------------------------------
-import removeAnimeFromList from "./DELETE/removeFromList";      // Elimina un anime de una lista.
-import deleteProfile from "./DELETE/deleteProfile";            // Elimina un perfil de usuario.
+import removeAnimeFromList from "./DELETE/removeFromList"; // Elimina un anime de una lista.
+import deleteProfile from "./DELETE/deleteProfile"; // Elimina un perfil de usuario.
 
 // ---------------------------
 // Importación de módulos PUT
 // ---------------------------
-import updateProfile from "./PUT/updateProfile";               // Actualiza información de un perfil.
-import getComments from "./GET/getComments";                   // Obtiene los comentarios de un episodio.
+import updateProfile from "./PUT/updateProfile"; // Actualiza información de un perfil.
+import getComments from "./GET/getComments"; // Obtiene los comentarios de un episodio.
 import getRandomAnime from "./GET/getRandomAnime";
-import addCharacterToAnime from "./POST/addCharacter";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -125,6 +128,16 @@ route.get("/anime/:animeId/review/all", getReviews);
 // Obtener una reseña específica de un anime.
 route.get("/anime/:animeId/review/:reviewId", getReviewById);
 
+// Obtener personajes de un anime en especifico
+
+route.get("/anime/:animeId/character/all", getCharacterOfAnAnime);
+
+// Obtener los animes relacionados a un personaje
+route.get("/character/:id/relatedAnimes", getCharacterRelatedAnime);
+
+// Obtener un personaje por su ID
+route.get("/character/:id", getCharacterById);
+
 // -------------------------------
 // Rutas de Episodios (GET)
 // -------------------------------
@@ -136,7 +149,7 @@ route.get("/anime/:animeId/episode/all", getEpisodes);
 route.get("/anime/episode/:episodeId/comment/all", getComments);
 
 // Obtiene los likes de un episodio
-route.get("/anime/episode/:episodeId/comment/likes/all", getCommentLikes)
+route.get("/anime/episode/:episodeId/comment/likes/all", getCommentLikes);
 
 // -------------------------------
 // Rutas de Perfiles (GET)
@@ -180,7 +193,10 @@ route.post("/anime/:animeId/episode/new", addEpisode);
 route.post("/anime/episode/:episodeId/comment/new", newComment);
 
 // Agregar un "like" a un comentario.
- route.post("/anime/episode/:episodeId/comment/:commentId/like/:profileId", addLikeToComment);
+route.post(
+  "/anime/episode/:episodeId/comment/:commentId/like/:profileId",
+  addLikeToComment
+);
 
 // Agregar un personaje al anime
 route.post("/anime/:animeId/character/new", addCharacterToAnime);
@@ -197,7 +213,10 @@ route.post("/user/login", login);
 route.post("/user/:userId/profile/d/new", newProfile);
 
 // Agregar un episodio al historial de visualización de un perfil.
-route.post("/user/profile/:profileId/history/:animeId/:episodeNumber/add", addToHistory);
+route.post(
+  "/user/profile/:profileId/history/:animeId/:episodeNumber/add",
+  addToHistory
+);
 
 // --- Operaciones sobre Listas ---
 // Crear una nueva lista para un perfil.
