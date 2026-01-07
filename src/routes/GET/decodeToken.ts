@@ -11,7 +11,11 @@ export default async function decodeToken(req: Request, res: Response) {
             return
         }else{
             const decodedToken = new User("","","").decodeToken(token)
-            res.statusCode = 200
+            if (decodedToken.message =="There was an error decoding the token") {
+                res.statusCode = 500
+            }else{
+                res.statusCode = 200
+            }
             res.json({message:"Token decoded", user:decodedToken})
         }
     } catch (error:any) {

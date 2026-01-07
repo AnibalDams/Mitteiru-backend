@@ -7,7 +7,8 @@ import dbClient from "../libs/dbClient";
 import verifyFields from "../libs/fieldsVerifier";
 import { Anime } from "./animes";
 import { ObjectId } from "mongodb";
-
+  
+let characterCollection = dbClient.collection<Icharacter>("characters"); 
 export default class Character {
   animeId: string;
   name: string;
@@ -85,7 +86,7 @@ export default class Character {
       ) {
         return { message: "All fields are required" };
       }
-      await dbClient.collection("characters").insertOne(newCharacter);
+      await characterCollection.insertOne(newCharacter);
       return { message: "success" };
     } catch (error: any) {
       console.error(error);
@@ -94,9 +95,7 @@ export default class Character {
   }
   static async getById(characterId: string): Promise<ReturnData> {
     try {
-      const character = await dbClient
-        .collection("characters")
-        .findOne({ _id: new ObjectId(characterId) });
+      const character = await characterCollection.findOne({ _id: new ObjectId(characterId) });
       if (!character) {
         return { message: "Character not found" };
       }
@@ -115,13 +114,10 @@ export default class Character {
       if (!anime) {
         return { message: "Anime not found" };
       }
-      const dbCharacters = await dbClient
-        .collection("characters")
-        .find({ relatedAnimes: animeId })
-        .toArray();
-      dbCharacters.map((character) => characters.push(character as Icharacter));
+      const dbCharacters = await characterCollection.find({ relatedAnimes: animeId }).toArray();
+     
 
-      return { message: "Success", characters: characters };
+      return { message: "Success", characters: dbCharacters };
     } catch (error: any) {
       return {
         message: "An error has occurred while getting the character",
@@ -134,9 +130,7 @@ export default class Character {
     characterId: string
   ): Promise<ReturnData> {
     try {
-      const character = await dbClient
-        .collection("characters")
-        .findOne({ _id: new ObjectId(characterId) });
+      const character = await characterCollection.findOne({ _id: new ObjectId(characterId) });
       if (!character) {
         return { message: "Character not found" };
       }
