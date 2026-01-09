@@ -1,5 +1,7 @@
+import { ObjectId } from "mongodb";
+
 export interface Anime_{
-    id: number;
+    _id?: string|ObjectId;
     name: string;
     japaneseName: string;
     synopsis: string;
@@ -8,6 +10,9 @@ export interface Anime_{
     cover: string;
     image: string;
     onGoing: number;
+    createdAt:number;
     horizontalImage: string;
     genres: string[];
+    views:number;
+    likes:number;
 }

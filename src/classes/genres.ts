@@ -1,5 +1,6 @@
 import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
+import type { Anime_ as Ianime } from "../libs/types/Anime";
 import { Anime } from "./animes";
 
 export default class Genre {
@@ -26,11 +27,13 @@ export default class Genre {
     try {
       const animesWithGenre = await dbClient.collection("genreAnime").find({ name: this.name }).toArray();
 
-      const animes = []
+      const animes:Ianime[] = []
 
       for (let i = 0; i < animesWithGenre.length; i++) {
         const anime = (await new Anime(animesWithGenre[i].animeId.toString()).getById()).animes;
-        animes.push(anime)
+        if(anime){
+           animes.push(anime as Ianime);
+        }
 
       }
       return { message: "Success", animes: animes };

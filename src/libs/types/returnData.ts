@@ -1,4 +1,5 @@
 import type { Character } from "../../classes/interfaces/Character";
+import type { Anime_ as Ianime } from "./Anime";
 
 interface List{
   id: number
@@ -9,7 +10,7 @@ interface List{
 
 export default interface ReturnData {
     message: string;
-    animes?: any;
+    animes?: Ianime|Ianime[];
     episodes?:any;
     reviews?:any;
     error?: string | null;
