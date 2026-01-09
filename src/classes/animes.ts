@@ -50,7 +50,7 @@ export class Anime {
         .findOne({ name: this.name });
 
       if (verifyAnime != null) {
-        animeCollection.findOneAndUpdate(
+        await animeCollection.findOneAndUpdate(
           { name: this.name },
           {
             $set: {
