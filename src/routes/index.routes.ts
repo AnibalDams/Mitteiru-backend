@@ -170,7 +170,7 @@ route.get("/user/profile/:profileId/list/all", getLists);
 
 // Obtener todos los animes contenidos en una lista específica.
 route.get("/user/profile/:profileId/list/anime/all", getAnimesInList);
-
+ 
 // ================================
 // Rutas POST - Creación y modificación de datos
 // ================================
