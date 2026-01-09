@@ -327,9 +327,7 @@ export class Anime {
   }
   async getMostLiked(): Promise<ReturnData> {
     try {
-      const mostLikedAnimes = (await animeCollection.find().toArray()).sort(
-        (a, b) => b.likes - a.likes
-      );
+      const mostLikedAnimes = await animeCollection.find().sort({likes:-1}).toArray();
 
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
