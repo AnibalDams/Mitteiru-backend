@@ -129,9 +129,25 @@ export class Anime {
   }
   static async getRandomAnime(): Promise<ReturnData> {
     try {
-      const animes = await dbClient.collection("anime").find().toArray()
-      const randomNumber = getRandomInt(0, animes.length - 1);
-      return { message: "success", animes: animes[randomNumber] };
+      // Fetch only 1 random document directly from DB
+      const cursor = await dbClient.collection("anime").aggregate([
+        { $sample: { size: 1 } }
+      ]);
+
+      const result = await cursor.toArray();
+
+      if (result.length === 0) {
+        return { message: "No anime found", error: "Collection is empty" };
+      }
+
+      const selectedAnime = result[0];
+
+      // Sort genres
+      if (selectedAnime.genres && Array.isArray(selectedAnime.genres)) {
+        selectedAnime.genres.sort();
+      }
+
+      return { message: "success", animes: selectedAnime };
     } catch (error: any) {
       return { message: "An error has occurred", error: error.message }
     }
@@ -145,6 +161,7 @@ export class Anime {
         { returnDocument: "after" }
       );
 
+      anime.genres.sort();
 
 
       return { message: "anime found", animes: anime };
