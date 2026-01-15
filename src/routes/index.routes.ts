@@ -13,6 +13,8 @@
 import { Router } from "express";
 import { htmlPage } from "../libs/page";
 
+import auth from "../libs/adminMiddleware";
+
 // ---------------------------
 // Importación de módulos POST
 // ---------------------------
@@ -29,6 +31,8 @@ import addLikeToAnime from "./POST/addLike"; // Agrega un "like" a un anime.
 import addReview from "./POST/addReview"; // Crea una reseña para un anime.
 import addLikeToComment from "./POST/addLikeToComment"; // Agrega un "like" a un comentario.
 import addCharacterToAnime from "./POST/addCharacter"; // Agrega un personaje a un anime
+import newAdminUser from "./POST/newAdminUser";  // Agrega un nuevo administrador sin ser aceptado aun
+import adminLogin from "./POST/adminLogin"; // Login para usuarios administradores
 
 // ---------------------------
 // Importación de módulos GET
@@ -55,19 +59,24 @@ import getCommentLikes from "./GET/getCommentLikes"; // Obtiene tanto el conteo 
 import getCharacterOfAnAnime from "./POST/getCharacters"; // Obtiene los personajes de un anime en especifico
 import getCharacterRelatedAnime from "./GET/getCharacterRelatedAnime"; // Obtiene los animes relacionados a un personaje
 import getCharacterById from "./GET/getCharacterById"; // Obtiene un personaje por su ID
+import getRandomAnime from "./GET/getRandomAnime";  // Obtiene un anime random de la base de datos
+import getComments from "./GET/getComments"; // Obtiene los comentarios de un episodio.
 
 // ------------------------------
 // Importación de módulos DELETE
 // ------------------------------
 import removeAnimeFromList from "./DELETE/removeFromList"; // Elimina un anime de una lista.
 import deleteProfile from "./DELETE/deleteProfile"; // Elimina un perfil de usuario.
+import deleteAnime from "./DELETE/deleteAnime"; // Eliminar un anime
+import deleteEpisode from "./DELETE/deleteEpisode";
 
 // ---------------------------
 // Importación de módulos PUT
 // ---------------------------
 import updateProfile from "./PUT/updateProfile"; // Actualiza información de un perfil.
-import getComments from "./GET/getComments"; // Obtiene los comentarios de un episodio.
-import getRandomAnime from "./GET/getRandomAnime";
+import updateAnime from "./PUT/updateAnime"; // Actualiza información de un anime.
+import updateEpisode from "./PUT/updateEpisode"; // Actualiza informacion de un episodio
+
 
 // Crear el Router principal de Express
 const route = Router();
@@ -170,7 +179,7 @@ route.get("/user/profile/:profileId/list/all", getLists);
 
 // Obtener todos los animes contenidos en una lista específica.
 route.get("/user/profile/:profileId/list/anime/all", getAnimesInList);
- 
+
 // ================================
 // Rutas POST - Creación y modificación de datos
 // ================================
@@ -201,6 +210,26 @@ route.post(
 // Agregar un personaje al anime
 route.post("/anime/:animeId/character/new", addCharacterToAnime);
 
+// ================================
+// Rutas PUT - Actualización de datos
+// ================================
+
+// Actualizar información de un anime.
+route.put("/anime/:animeId", auth, updateAnime);
+
+// Actualizar información de un episodio
+route.put("/anime/episode/:episodeId", auth, updateEpisode);
+
+// ================================
+// Rutas DELETE - Eliminación de datos
+// ================================
+
+// Eliminar un anime
+route.delete("/anime/:animeId", auth, deleteAnime)
+
+// Eliminar un episodio determinado
+route.delete("/anime/episode/:episodeId", auth, deleteEpisode)
+
 // --- Operaciones sobre Usuarios ---
 // Registro de un nuevo usuario.
 route.post("/user/new", signUp);
@@ -225,6 +254,14 @@ route.post("/user/profile/:profileId/list/new", newList);
 // Agregar un anime a una lista.
 route.post("/anime/:animeId/list/:listId/add", addAnimeToList);
 
+// -- Operaciones sobre Administradores -- 
+// Crear un nuevo usuario administrador
+route.post("/admin/new", newAdminUser);
+
+// Login para ingreso del administrador
+route.post("/admin/login", adminLogin);
+
+
 // ================================
 // Rutas DELETE - Eliminación de datos
 // ================================
@@ -244,6 +281,8 @@ route.delete("/user/profile/list/:listId/anime/:animeId", removeAnimeFromList);
 
 // Actualizar información de un perfil.
 route.put("/user/profile/:profileId", updateProfile);
+
+
 
 // Exportar el Router para uso en la aplicación
 export default route;

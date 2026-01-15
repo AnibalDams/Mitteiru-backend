@@ -2,6 +2,7 @@ import dbClient from "../libs/dbClient";
 import { Anime } from "./animes";
 import { ObjectId } from "mongodb";
 import type ReturnData from "../libs/types/returnData";
+import type { Anime_ as Ianime} from "../libs/types/Anime";
 
 export default class AnimeInList {
   id: string;

@@ -1,9 +1,11 @@
-import database from "../libs/db";
 import dbClient from "../libs/dbClient";
 import { Anime } from "./animes";
+import type { Episode as IEpisode } from "./interfaces/Episodes";
 import type ReturnData from "../libs/types/returnData";
-import { MongoDBCollectionNamespace, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import externalCheck from "../libs/externalChecker";
+
+const episodeCollection = dbClient.collection<IEpisode>("episodes");
 
 export default class Episode {
   id: string;
@@ -36,21 +38,20 @@ export default class Episode {
     try {
       let type = this.link.split(".")[this.link.split(".").length - 1];
       let externalVideo = externalCheck(type)
-      
+
       const doesTheAnimeExist = await new Anime(this.animeId).getById();
 
       if (!doesTheAnimeExist.animes === null) {
         return { message: "The anime does not exist" };
       } else {
-        const verifyEpisode = await dbClient
-          .collection("episodes")
+        const verifyEpisode = await episodeCollection
           .findOne({
             episodeNumber: this.episodeNumber,
             animeId: new ObjectId(this.animeId),
           });
 
         if (verifyEpisode != null) {
-          await dbClient.collection("episodes").findOneAndUpdate(
+          await episodeCollection.findOneAndUpdate(
             { _id: verifyEpisode._id },
             {
               $set: {
@@ -58,7 +59,7 @@ export default class Episode {
                 synopsis: this.synopsis,
                 thumbnail: this.thumbnail,
                 link: this.link,
-                external:externalVideo
+                external: externalVideo
 
               },
             }
@@ -67,14 +68,14 @@ export default class Episode {
           return { message: "The episode was added to the anime" };
         }
 
-        await dbClient.collection("episodes").insertOne({
+        await episodeCollection.insertOne({
           name: this.name,
           synopsis: this.synopsis,
           thumbnail: this.thumbnail,
           link: this.link,
           animeId: new ObjectId(this.animeId),
           episodeNumber: this.episodeNumber,
-          external:externalVideo
+          external: externalVideo
         });
 
         return { message: "The episode was added to the anime" };
@@ -94,8 +95,7 @@ export default class Episode {
       if (!doesTheAnimeExist.animes === null) {
         return { message: "The anime does not exist" };
       }
-      const episodes = await dbClient
-        .collection("episodes")
+      const episodes = await episodeCollection
         .find({ animeId: new ObjectId(this.animeId) })
         .toArray();
       return { message: "success", episodes: episodes };
@@ -113,8 +113,7 @@ export default class Episode {
     profileImage: string
   ): Promise<ReturnData> {
     try {
-      const episode = await dbClient
-        .collection("episodes")
+      const episode = await episodeCollection
         .findOne({ _id: new ObjectId(this.id) });
       if (!episode) {
         return { message: "The episode does not exist" };
@@ -137,8 +136,7 @@ export default class Episode {
   }
   async getComments(): Promise<ReturnData> {
     try {
-      const episode = await dbClient
-        .collection("episodes")
+      const episode = await episodeCollection
         .findOne({ _id: new ObjectId(this.id) });
       if (!episode) {
         return { message: "The episode does not exist" };
@@ -186,7 +184,7 @@ export default class Episode {
       await dbClient.collection("commentLikes").insertOne({
         date: new Date().getTime(),
         commentId: new ObjectId(commentId),
-        episodeId:new ObjectId(this.id),
+        episodeId: new ObjectId(this.id),
         profileId: new ObjectId(profileId),
       });
       return { message: "The like was added successfully" };
@@ -197,12 +195,43 @@ export default class Episode {
       };
     }
   }
-  async getLikesOfAComment():Promise<ReturnData>{
+  async getLikesOfAComment(): Promise<ReturnData> {
     try {
-      const commentsLikes = await dbClient.collection("commentLikes").find({episodeId:new ObjectId(this.id)}).toArray()
-      return {message:"Success", likesCount:commentsLikes.length, commentsLikes:commentsLikes}
-    } catch (error:any) {
-      return {message :"An error has occurred while getting the likes", error:error.message}
+      const commentsLikes = await dbClient.collection("commentLikes").find({ episodeId: new ObjectId(this.id) }).toArray()
+      return { message: "Success", likesCount: commentsLikes.length, commentsLikes: commentsLikes }
+    } catch (error: any) {
+      return { message: "An error has occurred while getting the likes", error: error.message }
+    }
+  }
+
+  static async update(id: string, data: IEpisode): Promise<ReturnData> {
+    try {
+      const verifyEpisode = await episodeCollection.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!verifyEpisode) {
+        return { message: "The episode does not exist" };
+      }
+      await episodeCollection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: data }
+      );
+      return { message: "The episode was updated successfully" };
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
+    }
+  }
+  static async delete(id: string): Promise<ReturnData> {
+    try {
+      const verify = await episodeCollection.findOne({ _id: new ObjectId(id) });
+      if (!verify) {
+        return { message: "The episode does not exist" };
+      }
+      await episodeCollection.deleteOne({ _id: new ObjectId(id) });
+      return { message: "The episode was deleted successfully" };
+    }
+    catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
     }
   }
 }

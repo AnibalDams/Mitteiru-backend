@@ -15,4 +15,8 @@ export interface Anime_{
     genres: string[];
     views:number;
     likes:number;
+    listId?:string|ObjectId;
+    id2?:string|ObjectId;
+
+
 }

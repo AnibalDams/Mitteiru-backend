@@ -4,6 +4,9 @@ import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 import moment from "moment";
 import { Anime } from "./animes";
+
+const historyCollection = dbClient.collection("history");
+
 export default class History {
   id: string;
   animeId: string;
@@ -30,7 +33,7 @@ export default class History {
       const today = new Date().getTime();
       const todayString = new Date(today).toISOString().substring(0, 10);
 
-      const isThereAnime: any = await dbClient.collection("history").find({profileId:new ObjectId(this.profileId), animeId:new ObjectId(this.animeId)}).toArray()
+      const isThereAnime: any = await historyCollection.find({profileId:new ObjectId(this.profileId), animeId:new ObjectId(this.animeId)}).toArray()
 
         const dates: any = {};
         for (let i = 0; i < isThereAnime.length; i++) {
@@ -39,7 +42,7 @@ export default class History {
           dates[animeDate] = animeDate;
         }
         if (!dates[todayString]) {
-          await dbClient.collection("history").insertOne({animeId:new ObjectId(this.animeId),episodeNumber:this.episodeNumber,date:today,profileId:new ObjectId(this.profileId)})
+          await historyCollection.insertOne({animeId:new ObjectId(this.animeId),episodeNumber:this.episodeNumber,date:today,profileId:new ObjectId(this.profileId)})
   
             
         }
@@ -57,7 +60,7 @@ export default class History {
 
   async get():Promise< ReturnData> {
     try {
-      const getHistory = await dbClient.collection("history").find({profileId: new ObjectId(this.profileId)}).sort({date:-1}).toArray()
+      const getHistory = await historyCollection.find({profileId: new ObjectId(this.profileId)}).sort({date:-1}).toArray()
 
       const history:any = [];
         
@@ -96,4 +99,24 @@ export default class History {
       };
     }
   }
+
+  static async deleteFromProfile(profileId: ObjectId): Promise<ReturnData> {
+    try {
+      const verify:any = await historyCollection.find({ profileId: profileId }).toArray();
+      if (!verify || verify.length === 0) {
+        return { message: "History not found" };
+      }
+      for (const history of verify){
+        await historyCollection.deleteOne({_id:history._id})
+      }
+      return { message: "Success" };
+
+    } catch (error:any) {
+      return {
+        message: "An error has occurred while deleting the History",
+        error: error.message,
+      };
+    }
+  }
+
 }

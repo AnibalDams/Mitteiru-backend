@@ -163,6 +163,9 @@ export class Anime {
         { $inc: { views: 1 } },
         { returnDocument: "after" }
       );
+      if (anime === null) {
+        return { message: "no anime found" };
+      }
 
       anime.genres.sort();
 
@@ -327,7 +330,7 @@ export class Anime {
   }
   async getMostLiked(): Promise<ReturnData> {
     try {
-      const mostLikedAnimes = await animeCollection.find().sort({likes:-1}).toArray();
+      const mostLikedAnimes = await animeCollection.find().sort({ likes: -1 }).toArray();
 
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
@@ -395,6 +398,33 @@ export class Anime {
         message: "There was an error while getting the review",
         error: error.message,
       };
+    }
+  }
+
+  static async update(id: string, data: Ianime): Promise<ReturnData> {
+    try {
+      const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
+      if (!verifyAnime) {
+        return { message: "Anime not found" }
+      }
+      await animeCollection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: data })
+
+      return { message: "success" }
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
+    }
+  }
+
+  static async delete(id: string): Promise<ReturnData> {
+    try {
+      const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
+      if (!verifyAnime) {
+        return { message: "Anime not found" }
+      }
+      await animeCollection.findOneAndDelete({ _id: new ObjectId(id) })
+      return { message: "success" }
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
     }
   }
 }

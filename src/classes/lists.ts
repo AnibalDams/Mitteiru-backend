@@ -1,5 +1,4 @@
 import { ObjectId } from "mongodb";
-import database from "../libs/db";
 import dbClient from "../libs/dbClient";
 import type ReturnData from "../libs/types/returnData";
 
@@ -37,6 +36,19 @@ export default class List {
       return { message: "Success", lists: all };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
+    }
+  }
+  static async deleteList(id:string){
+    try {
+      const verify = await dbClient.collection("lists").findOne({_id:new ObjectId(id)})
+      if (!verify) {
+        return { message: "List not found" };
+      }
+      await dbClient.collection("lists").deleteOne({_id:new ObjectId(id)})
+      return { message: "Success" };
+      
+    } catch (error:any) {
+      return {message:"An error occurred", error:error.message}
     }
   }
 }
