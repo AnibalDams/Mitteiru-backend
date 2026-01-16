@@ -6,6 +6,7 @@ import type ReturnData from "../libs/types/returnData";
 import dbClient from "../libs/dbClient";
 import verifyFields from "../libs/fieldsVerifier";
 import { Anime } from "./animes";
+import type { Anime_ as Ianime } from "../libs/types/Anime";
 import { ObjectId } from "mongodb";
   
 let characterCollection = dbClient.collection<Icharacter>("characters"); 
@@ -134,11 +135,11 @@ export default class Character {
       if (!character) {
         return { message: "Character not found" };
       }
-      let relatedAnimesInfo: Anime[] = [];
+      let relatedAnimesInfo: Ianime[] = [];
       for (const animeId of character.relatedAnimes) {
         const animeData = await new Anime(animeId).getById();
         if (animeData.animes) {
-          relatedAnimesInfo.push(animeData.animes);
+          relatedAnimesInfo.push(animeData.animes as Ianime);
         }
       }
       return { message: "Success", animes: relatedAnimesInfo };

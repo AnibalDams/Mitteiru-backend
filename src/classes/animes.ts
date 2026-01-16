@@ -1,12 +1,16 @@
 import { ObjectId } from "mongodb";
-import dbClient from "../libs/dbClient";
-import type ReturnData from "../libs/types/returnData";
-import type { Anime_ as Ianime } from "../libs/types/Anime";
-import getRandomInt from "../libs/randomNumber";
+import dbClient from "../libs/dbClient"; // Conexión a la base de datos
+import type ReturnData from "../libs/types/returnData"; // Tipos de datos para respuestas
+import type { Anime_ as Ianime } from "../libs/types/Anime"; // La "forma" que debe tener un anime
+import getRandomInt from "../libs/randomNumber"; // Ayuda para elegir números al azar
 import Genre from "./genres";
 
+// Referencia rápida a la colección (tabla) de "anime" en la base de datos
 const animeCollection = dbClient.collection<Ianime>("anime");
+
 export class Anime {
+  // 1. DEFINICIÓN DE DATOS
+  // Aquí declaramos todas las características que tendrá un anime.
   id: string;
   name: string;
   japaneseName: string;
@@ -15,9 +19,13 @@ export class Anime {
   studio: string;
   cover: string;
   image: string;
-  onGoing: number;
+  onGoing: number; // 1 si está en emisión, 0 si terminó
   horizontalImage: string;
   genres: string[];
+
+  // 2. CONSTRUCTOR
+  // Esta función se ejecuta cuando haces "new Anime(...)".
+  // Rellena la ficha técnica del anime con los datos que le pases.
   public constructor(
     id: string = "",
     name: string = "",
@@ -43,17 +51,25 @@ export class Anime {
     this.horizontalImage = horizontalImage;
     this.genres = genres;
   }
+
+  // 3. MÉTODO MAESTRO: GUARDAR / ACTUALIZAR
+  // Este método es inteligente:
+  // - Si el anime ya existe (por nombre), actualiza sus datos.
+  // - Si no existe, crea uno nuevo desde cero.
   async new(): Promise<ReturnData> {
     try {
+      // ¿Existe ya un anime con este nombre?
       const verifyAnime = await dbClient
         .collection("anime")
         .findOne({ name: this.name });
 
+      // CASO A: SI EXISTE -> ACTUALIZAMOS
       if (verifyAnime != null) {
         await animeCollection.findOneAndUpdate(
           { name: this.name },
           {
             $set: {
+              // Sobrescribimos los datos viejos con los nuevos
               name: this.name,
               japaneseName: this.japaneseName,
               synopsis: this.synopsis,
@@ -71,6 +87,8 @@ export class Anime {
           message: "The anime has been updated successfully",
         };
       }
+
+      // CASO B: NO EXISTE -> CREAMOS UNO NUEVO
       const newAnime = await animeCollection.insertOne({
         name: this.name,
         japaneseName: this.japaneseName,
@@ -82,35 +100,39 @@ export class Anime {
         horizontalImage: this.horizontalImage,
         onGoing: this.onGoing,
         genres: this.genres,
-        createdAt: new Date().getTime(),
-        views: 0,
-        likes: 0,
+        createdAt: new Date().getTime(), // Guardamos la fecha actual
+        views: 0, // Empieza con 0 vistas
+        likes: 0, // Empieza con 0 likes
       });
 
       const animeId = newAnime.insertedId;
 
+      // LOGICA DE GÉNEROS
+      // Recorremos los géneros (ej: ["Acción", "Romance"])
       for (let i = 0; i < this.genres.length; i++) {
         const genre = this.genres[i];
+
+        // Verificamos si el género existe en la tabla de géneros
         const doesTheGenreExist = await dbClient
           .collection("genres")
           .findOne({ name: genre });
+
+        // Si no existe el género, lo creamos primero
         if (doesTheGenreExist == null) {
           await dbClient.collection("genres").insertOne({ name: genre });
-          await dbClient
-            .collection("genreAnime")
-            .insertOne({ name: genre, animeId: animeId });
-        } else {
-          await dbClient
-            .collection("genreAnime")
-            .insertOne({ name: genre, animeId: animeId });
         }
+
+        // Vinculamos este Anime con ese Género en una tabla intermedia
+        await dbClient
+          .collection("genreAnime")
+          .insertOne({ name: genre, animeId: animeId });
       }
+
       return {
         message: "The anime has been created successfully",
       };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while creating an Anime",
         error: error.message,
@@ -118,6 +140,7 @@ export class Anime {
     }
   }
 
+  // Trae los últimos 10 animes agregados (para la página de inicio)
   async getAll(): Promise<ReturnData> {
     try {
       const animes = (await animeCollection.find().limit(10).toArray()).sort(
@@ -132,11 +155,12 @@ export class Anime {
       };
     }
   }
+
+  // Selecciona un anime aleatorio de toda la base de datos
   static async getRandomAnime(): Promise<ReturnData> {
     try {
-      // Fetch only 1 random document directly from DB
+      // $sample es un truco de MongoDB para sacar items al azar
       const cursor = animeCollection.aggregate([{ $sample: { size: 1 } }]);
-
       const result = (await cursor.toArray()) as Ianime[];
 
       if (result.length === 0) {
@@ -145,7 +169,7 @@ export class Anime {
 
       const selectedAnime = result[0];
 
-      // Sort genres
+      // Ordenamos los géneros alfabéticamente para que se vean bonitos
       if (selectedAnime.genres && Array.isArray(selectedAnime.genres)) {
         selectedAnime.genres.sort();
       }
@@ -156,12 +180,14 @@ export class Anime {
     }
   }
 
+  // Busca un anime por su ID único
+  // IMPORTANTE: Al buscarlo, automáticamente le suma +1 a las vistas (views)
   async getById(): Promise<ReturnData> {
     try {
       const anime: any = await animeCollection.findOneAndUpdate(
         { _id: new ObjectId(this.id) },
-        { $inc: { views: 1 } },
-        { returnDocument: "after" }
+        { $inc: { views: 1 } }, // $inc incrementa el contador
+        { returnDocument: "after" } // Devuelve el documento ya actualizado
       );
       if (anime === null) {
         return { message: "no anime found" };
@@ -172,13 +198,14 @@ export class Anime {
       return { message: "anime found", animes: anime };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
+
+  // Filtra animes por estudio de animación (ej. "MAPPA")
   async getAnimesOfAnStudio(): Promise<ReturnData> {
     try {
       const animes = (
@@ -187,25 +214,25 @@ export class Anime {
       return { message: "success", animes: animes };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
+
+  // Trae los 12 animes más vistos (Top Popular)
   async getMostPopular(): Promise<ReturnData> {
     try {
       const animes = await animeCollection
         .find()
-        .sort({ views: -1 })
+        .sort({ views: -1 }) // -1 significa orden descendente (mayor a menor)
         .limit(12)
         .toArray();
 
       return { message: "success", animes: animes };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
@@ -213,6 +240,10 @@ export class Anime {
     }
   }
 
+  // Algoritmo de recomendación
+  // 1. Mira los géneros del anime actual.
+  // 2. Elige uno al azar.
+  // 3. Busca otros animes con ese género.
   async getSimilar(): Promise<ReturnData> {
     try {
       const animeG: any = await animeCollection.findOne({
@@ -222,16 +253,19 @@ export class Anime {
       if (animeG === null) {
         return { message: "no anime found" };
       }
+      // Elige un índice al azar de la lista de géneros
       const randomNumber = getRandomInt(0, animeG.genres.length - 1);
       const animes: any[] = [];
+
+      // Usa la clase Genre para buscar coincidencias
       const allAnimes = (
         await new Genre("", animeG.genres[randomNumber]).getAnimes()
       ).animes;
 
+      // Filtra para no recomendar el mismo anime que estás viendo
       if (allAnimes && Array.isArray(allAnimes)) {
         for (let i = 0; i < allAnimes.length; i++) {
           const anime = allAnimes[i];
-
           if (new ObjectId(anime._id).toString() != this.id) {
             animes.push(anime);
           }
@@ -240,13 +274,14 @@ export class Anime {
       return { message: "success", animes: animes };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the similar Animes",
         error: error.message,
       };
     }
   }
+
+  // Filtro simple por año de lanzamiento
   async getAnimesOfAYear(): Promise<ReturnData> {
     try {
       const animes = await animeCollection
@@ -255,58 +290,67 @@ export class Anime {
       return { message: "Success", animes: animes };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the animes",
         error: error.message,
       };
     }
   }
+
+  // Interruptor de "Me gusta"
+  // Si ya le diste like, te lo quita. Si no, te lo pone.
   async addLike(profileId: string): Promise<ReturnData> {
     try {
       const anime = await animeCollection.findOne({
         _id: new ObjectId(this.id),
       });
+
+      // Verifica si este usuario ya le dio like a este anime
       const verifyLike = await dbClient.collection("likes").findOne({
         profileId: new ObjectId(profileId),
         animeId: new ObjectId(this.id),
       });
 
+      // CASO: YA TIENE LIKE -> LO QUITAMOS (Dislike)
       if (verifyLike != null) {
         await dbClient.collection("likes").findOneAndDelete({
           profileId: new ObjectId(profileId),
           animeId: new ObjectId(this.id),
         });
         if (anime) {
+          // Restamos 1 al contador global del anime
           await animeCollection.findOneAndUpdate(
             { _id: new ObjectId(this.id) },
             { $set: { likes: anime.likes - 1 } }
           );
         }
-
-        return { message: "success 1" };
+        return { message: "success 1" }; // Indica que se quitó el like
       }
+
+      // CASO: NO TIENE LIKE -> LO AGREGAMOS
       await dbClient.collection("likes").insertOne({
         animeId: new ObjectId(this.id),
         profileId: new ObjectId(profileId),
       });
       if (anime) {
+        // Sumamos 1 al contador global
         await animeCollection.findOneAndUpdate(
           { _id: new ObjectId(this.id) },
           { $set: { likes: anime.likes + 1 } }
         );
       }
 
-      return { message: "success 2" };
+      return { message: "success 2" }; // Indica que se agregó el like
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while adding the like",
         error: error.message,
       };
     }
   }
+
+  // Obtiene la cantidad de likes y la lista de usuarios que dieron like
   async getLikes(): Promise<ReturnData> {
     try {
       const anime: any = await animeCollection.findOne({
@@ -324,24 +368,25 @@ export class Anime {
       };
     } catch (error: any) {
       console.error(error);
-
       return { message: "An error has occurred", error: error.message };
     }
   }
+
+  // Ranking de animes con más "Me gusta"
   async getMostLiked(): Promise<ReturnData> {
     try {
       const mostLikedAnimes = await animeCollection.find().sort({ likes: -1 }).toArray();
-
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
       console.error(error);
-
       return {
         message: "An error has occurred while getting the most liked animes",
         error: error.message,
       };
     }
   }
+
+  // Agrega un comentario/reseña a un anime
   async addReview(
     review: string,
     title: string,
@@ -369,6 +414,7 @@ export class Anime {
     }
   }
 
+  // Obtiene todas las reseñas de este anime, las más nuevas primero
   async getAllReviews(): Promise<ReturnData> {
     try {
       const reviews = await dbClient
@@ -384,6 +430,8 @@ export class Anime {
       };
     }
   }
+
+  // Obtiene una reseña específica por su ID
   async getReviewById(reviewId: string): Promise<ReturnData> {
     try {
       const review = await dbClient
@@ -401,6 +449,10 @@ export class Anime {
     }
   }
 
+  // MÉTODOS ESTÁTICOS DE ADMINISTRACIÓN
+  // Se pueden usar sin crear un objeto nuevo, útiles para paneles de admin.
+
+  // Actualizar un anime específico dada su ID y los nuevos datos
   static async update(id: string, data: Ianime): Promise<ReturnData> {
     try {
       const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
@@ -415,6 +467,7 @@ export class Anime {
     }
   }
 
+  // Eliminar un anime de la base de datos
   static async delete(id: string): Promise<ReturnData> {
     try {
       const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
@@ -424,6 +477,17 @@ export class Anime {
       await animeCollection.findOneAndDelete({ _id: new ObjectId(id) })
       return { message: "success" }
     } catch (error: any) {
+      return { message: "An error has occurred", error: error.message }
+    }
+  }
+
+  // Contabilizar la cantidad de animes en la base de datos
+  static async count() {
+    try {
+      const animeCount = await animeCollection.countDocuments();
+      return { message: "success", count: animeCount }
+    }
+    catch (error: any) {
       return { message: "An error has occurred", error: error.message }
     }
   }

@@ -61,6 +61,8 @@ import getCharacterRelatedAnime from "./GET/getCharacterRelatedAnime"; // Obtien
 import getCharacterById from "./GET/getCharacterById"; // Obtiene un personaje por su ID
 import getRandomAnime from "./GET/getRandomAnime";  // Obtiene un anime random de la base de datos
 import getComments from "./GET/getComments"; // Obtiene los comentarios de un episodio.
+import getAllUsers from "./GET/getAllUser"; // Obtiene todos los usuarios por paginacion
+import getAnimesCount from "./GET/getAnimeCount"; // Obtiene el total de animes en la base de datos
 
 // ------------------------------
 // Importación de módulos DELETE
@@ -68,7 +70,8 @@ import getComments from "./GET/getComments"; // Obtiene los comentarios de un ep
 import removeAnimeFromList from "./DELETE/removeFromList"; // Elimina un anime de una lista.
 import deleteProfile from "./DELETE/deleteProfile"; // Elimina un perfil de usuario.
 import deleteAnime from "./DELETE/deleteAnime"; // Eliminar un anime
-import deleteEpisode from "./DELETE/deleteEpisode";
+import deleteEpisode from "./DELETE/deleteEpisode"; // Elimina el episodio de un anime
+import deleteUser from "./DELETE/deleteUser"; // Elimina un usuario y todos sus datos de la base de datos
 
 // ---------------------------
 // Importación de módulos PUT
@@ -103,6 +106,10 @@ route.get("/anime/:animeId", getAnimeById);
 // Obtener todos los animes.
 // Se utiliza "/d/" para rutas fijas, evitando conflicto con los parámetros.
 route.get("/anime/d/all", getAllAnimes);
+
+// Obtiene la cantidad de animes disponibles
+
+route.get("/anime/d/count", getAnimesCount)
 
 // Obtener un anime random
 route.get("/anime/d/random", getRandomAnime);
@@ -231,11 +238,30 @@ route.delete("/anime/:animeId", auth, deleteAnime)
 route.delete("/anime/episode/:episodeId", auth, deleteEpisode)
 
 // --- Operaciones sobre Usuarios ---
+
+
+// ================================
+// Rutas GET - Consultas de datos
+// ================================
+route.get("/user/d/all", auth, getAllUsers)
+
+
+// ================================
+// Rutas POST - Creación y modificación de datos
+// ================================
+
 // Registro de un nuevo usuario.
 route.post("/user/new", signUp);
 
 // Inicio de sesión.
 route.post("/user/login", login);
+
+
+// ================================
+// Rutas DELETE - Eliminación de datos
+// ================================
+
+route.delete("/user/:userId", auth, deleteUser)
 
 // --- Operaciones sobre Perfiles ---
 // Crear un nuevo perfil para un usuario.
