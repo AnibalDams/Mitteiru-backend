@@ -8,8 +8,8 @@ import verifyFields from "../libs/fieldsVerifier";
 import { Anime } from "./animes";
 import type { Anime_ as Ianime } from "../libs/types/Anime";
 import { ObjectId } from "mongodb";
-  
-let characterCollection = dbClient.collection<Icharacter>("characters"); 
+
+let characterCollection = dbClient.collection<Icharacter>("characters");
 export default class Character {
   animeId: string;
   name: string;
@@ -36,7 +36,7 @@ export default class Character {
     description: string = "",
     image: string = "",
     likes: number = 0,
-    relatedAnimes: string[] = []
+    relatedAnimes: string[] = [],
   ) {
     this.animeId = animeId;
     this.name = name;
@@ -96,7 +96,9 @@ export default class Character {
   }
   static async getById(characterId: string): Promise<ReturnData> {
     try {
-      const character = await characterCollection.findOne({ _id: new ObjectId(characterId) });
+      const character = await characterCollection.findOne({
+        _id: new ObjectId(characterId),
+      });
       if (!character) {
         return { message: "Character not found" };
       }
@@ -115,8 +117,9 @@ export default class Character {
       if (!anime) {
         return { message: "Anime not found" };
       }
-      const dbCharacters = await characterCollection.find({ relatedAnimes: animeId }).toArray();
-     
+      const dbCharacters = await characterCollection
+        .find({ relatedAnimes: animeId })
+        .toArray();
 
       return { message: "Success", characters: dbCharacters };
     } catch (error: any) {
@@ -128,10 +131,12 @@ export default class Character {
   }
 
   static async getRelatedAnimesInformation(
-    characterId: string
+    characterId: string,
   ): Promise<ReturnData> {
     try {
-      const character = await characterCollection.findOne({ _id: new ObjectId(characterId) });
+      const character = await characterCollection.findOne({
+        _id: new ObjectId(characterId),
+      });
       if (!character) {
         return { message: "Character not found" };
       }

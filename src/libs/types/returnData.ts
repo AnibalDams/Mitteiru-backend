@@ -2,13 +2,13 @@ import type { Character } from "../../classes/interfaces/Character";
 import type { AdminUser } from "../../classes/interfaces/AdminUser";
 import type { Episode } from "../../classes/interfaces/Episodes";
 import type { Anime_ as Ianime } from "./Anime";
+import type LearningProgress from "../../classes/interfaces/LearningProgress";
 
 interface List {
-  id: number
-  name: string
-  profileId: number
+  id: number;
+  name: string;
+  profileId: number;
 }
-
 
 export default interface ReturnData {
   message: string;
@@ -17,13 +17,13 @@ export default interface ReturnData {
   reviews?: any;
   error?: string | null;
   genres?: any[];
-  user?: any
-  profiles?: any
-  lists?: List[] | unknown[]
-  likesCount?: Number
-  comments?: any
-  commentsLikes?: any
-  characters?: Character | Character[]
-  AdminUser?: AdminUser | AdminUser[]
-
+  user?: any;
+  profiles?: any;
+  lists?: List[] | unknown[];
+  likesCount?: Number;
+  comments?: any;
+  commentsLikes?: any;
+  characters?: Character | Character[];
+  AdminUser?: AdminUser | AdminUser[];
+  learningProgress?:LearningProgress | LearningProgress[];
 }

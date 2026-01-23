@@ -37,7 +37,7 @@ export class Anime {
     image: string = "",
     onGoing: number = 0,
     horizontalImage: string = "",
-    genres: string[] = [""]
+    genres: string[] = [""],
   ) {
     this.id = id;
     this.name = name;
@@ -80,7 +80,7 @@ export class Anime {
               horizontalImage: this.horizontalImage,
               onGoing: this.onGoing,
             },
-          }
+          },
         );
 
         return {
@@ -144,7 +144,7 @@ export class Anime {
   async getAll(): Promise<ReturnData> {
     try {
       const animes = (await animeCollection.find().limit(10).toArray()).sort(
-        (a, b) => b.createdAt - a.createdAt
+        (a, b) => b.createdAt - a.createdAt,
       );
       return { message: "animes found", animes: animes };
     } catch (error: any) {
@@ -187,7 +187,7 @@ export class Anime {
       const anime: any = await animeCollection.findOneAndUpdate(
         { _id: new ObjectId(this.id) },
         { $inc: { views: 1 } }, // $inc incrementa el contador
-        { returnDocument: "after" } // Devuelve el documento ya actualizado
+        { returnDocument: "after" }, // Devuelve el documento ya actualizado
       );
       if (anime === null) {
         return { message: "no anime found" };
@@ -321,7 +321,7 @@ export class Anime {
           // Restamos 1 al contador global del anime
           await animeCollection.findOneAndUpdate(
             { _id: new ObjectId(this.id) },
-            { $set: { likes: anime.likes - 1 } }
+            { $set: { likes: anime.likes - 1 } },
           );
         }
         return { message: "success 1" }; // Indica que se quitó el like
@@ -336,7 +336,7 @@ export class Anime {
         // Sumamos 1 al contador global
         await animeCollection.findOneAndUpdate(
           { _id: new ObjectId(this.id) },
-          { $set: { likes: anime.likes + 1 } }
+          { $set: { likes: anime.likes + 1 } },
         );
       }
 
@@ -375,7 +375,10 @@ export class Anime {
   // Ranking de animes con más "Me gusta"
   async getMostLiked(): Promise<ReturnData> {
     try {
-      const mostLikedAnimes = await animeCollection.find().sort({ likes: -1 }).toArray();
+      const mostLikedAnimes = await animeCollection
+        .find()
+        .sort({ likes: -1 })
+        .toArray();
       return { message: "success", animes: mostLikedAnimes };
     } catch (error: any) {
       console.error(error);
@@ -392,7 +395,7 @@ export class Anime {
     title: string,
     profileId: string,
     profileName: string,
-    profileImage: string
+    profileImage: string,
   ): Promise<ReturnData> {
     try {
       await dbClient.collection("reviews").insertOne({
@@ -455,29 +458,36 @@ export class Anime {
   // Actualizar un anime específico dada su ID y los nuevos datos
   static async update(id: string, data: Ianime): Promise<ReturnData> {
     try {
-      const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
+      const verifyAnime = await animeCollection.findOne({
+        _id: new ObjectId(id),
+      });
       if (!verifyAnime) {
-        return { message: "Anime not found" }
+        return { message: "Anime not found" };
       }
-      await animeCollection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: data })
+      await animeCollection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: data },
+      );
 
-      return { message: "success" }
+      return { message: "success" };
     } catch (error: any) {
-      return { message: "An error has occurred", error: error.message }
+      return { message: "An error has occurred", error: error.message };
     }
   }
 
   // Eliminar un anime de la base de datos
   static async delete(id: string): Promise<ReturnData> {
     try {
-      const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(id) })
+      const verifyAnime = await animeCollection.findOne({
+        _id: new ObjectId(id),
+      });
       if (!verifyAnime) {
-        return { message: "Anime not found" }
+        return { message: "Anime not found" };
       }
-      await animeCollection.findOneAndDelete({ _id: new ObjectId(id) })
-      return { message: "success" }
+      await animeCollection.findOneAndDelete({ _id: new ObjectId(id) });
+      return { message: "success" };
     } catch (error: any) {
-      return { message: "An error has occurred", error: error.message }
+      return { message: "An error has occurred", error: error.message };
     }
   }
 
@@ -485,10 +495,9 @@ export class Anime {
   static async count() {
     try {
       const animeCount = await animeCollection.countDocuments();
-      return { message: "success", count: animeCount }
-    }
-    catch (error: any) {
-      return { message: "An error has occurred", error: error.message }
+      return { message: "success", count: animeCount };
+    } catch (error: any) {
+      return { message: "An error has occurred", error: error.message };
     }
   }
 }

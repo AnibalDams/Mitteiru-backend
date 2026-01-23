@@ -5,7 +5,12 @@ export default async function removeAnimeFromList(req: Request, res: Response) {
   try {
     const animeId = req.params.animeId;
     const listId = req.params.listId;
-    const removeAnime =await new AnimeInList("", animeId, listId, "").removeFromList();
+    const removeAnime = await new AnimeInList(
+      "",
+      animeId,
+      listId,
+      "",
+    ).removeFromList();
     switch (removeAnime.message) {
       case "success":
         res.statusCode = 200;

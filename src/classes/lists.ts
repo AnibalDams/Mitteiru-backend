@@ -15,11 +15,18 @@ export default class List {
 
   async new(): Promise<ReturnData> {
     try {
-      const verifyProfile =await dbClient.collection("profiles").findOne({_id:new ObjectId(this.profileId)});
+      const verifyProfile = await dbClient
+        .collection("profiles")
+        .findOne({ _id: new ObjectId(this.profileId) });
       if (verifyProfile == null) {
         return { message: "profile not found" };
       }
-      await dbClient.collection("lists").insertOne({name:this.name, profileId:new ObjectId(this.profileId)})
+      await dbClient
+        .collection("lists")
+        .insertOne({
+          name: this.name,
+          profileId: new ObjectId(this.profileId),
+        });
       return { message: "Success" };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
@@ -28,27 +35,33 @@ export default class List {
 
   async getAll(): Promise<ReturnData> {
     try {
-      const verifyProfile =await dbClient.collection("profiles").findOne({_id:new ObjectId(this.profileId)});
+      const verifyProfile = await dbClient
+        .collection("profiles")
+        .findOne({ _id: new ObjectId(this.profileId) });
       if (verifyProfile == null) {
         return { message: "Profile not found" };
       }
-      const all = await dbClient.collection("lists").find({profileId:new ObjectId(this.profileId)}).toArray();
+      const all = await dbClient
+        .collection("lists")
+        .find({ profileId: new ObjectId(this.profileId) })
+        .toArray();
       return { message: "Success", lists: all };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
     }
   }
-  static async deleteList(id:string){
+  static async deleteList(id: string) {
     try {
-      const verify = await dbClient.collection("lists").findOne({_id:new ObjectId(id)})
+      const verify = await dbClient
+        .collection("lists")
+        .findOne({ _id: new ObjectId(id) });
       if (!verify) {
         return { message: "List not found" };
       }
-      await dbClient.collection("lists").deleteOne({_id:new ObjectId(id)})
+      await dbClient.collection("lists").deleteOne({ _id: new ObjectId(id) });
       return { message: "Success" };
-      
-    } catch (error:any) {
-      return {message:"An error occurred", error:error.message}
+    } catch (error: any) {
+      return { message: "An error occurred", error: error.message };
     }
   }
 }

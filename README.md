@@ -8,7 +8,6 @@ bun install
 
 ### Run the server:
 
-
 ```bash
 bun run index.ts
 ```

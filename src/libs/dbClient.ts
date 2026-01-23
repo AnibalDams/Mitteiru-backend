@@ -1,5 +1,5 @@
-import { MongoClient, ServerApiVersion } from 'mongodb';
-  const uri:any = process.env.DATABASE;
+import { MongoClient, ServerApiVersion } from "mongodb";
+const uri: any = process.env.DATABASE;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -7,10 +7,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-
   },
-
-
 });
 
-export default client.db("anime")
+export default client.db("anime");

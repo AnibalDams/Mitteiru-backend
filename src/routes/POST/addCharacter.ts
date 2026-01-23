@@ -3,7 +3,7 @@ import Character from "../../classes/characters";
 
 export default async function addCharacterToAnime(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> {
   try {
     const {
@@ -30,7 +30,7 @@ export default async function addCharacterToAnime(
       description,
       image,
       0,
-      relatedAnimes
+      relatedAnimes,
     ).new();
 
     switch (newCharacter.message) {

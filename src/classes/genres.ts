@@ -16,8 +16,11 @@ export default class Genre {
 
   async getAll(): Promise<ReturnData> {
     try {
-
-      const genres = (await dbClient.collection("genres").find().sort({name:1}).toArray())
+      const genres = await dbClient
+        .collection("genres")
+        .find()
+        .sort({ name: 1 })
+        .toArray();
       return { message: "Success", genres: genres };
     } catch (error: any) {
       return { message: "An error occurred", error: error.message };
@@ -25,20 +28,24 @@ export default class Genre {
   }
   async getAnimes(): Promise<ReturnData> {
     try {
-      const animesWithGenre = await dbClient.collection("genreAnime").find({ name: this.name }).toArray();
+      const animesWithGenre = await dbClient
+        .collection("genreAnime")
+        .find({ name: this.name })
+        .toArray();
 
-      const animes:Ianime[] = []
+      const animes: Ianime[] = [];
 
       for (let i = 0; i < animesWithGenre.length; i++) {
-        const anime = (await new Anime(animesWithGenre[i].animeId.toString()).getById()).animes;
-        if(anime){
-           animes.push(anime as Ianime);
+        const anime = (
+          await new Anime(animesWithGenre[i].animeId.toString()).getById()
+        ).animes;
+        if (anime) {
+          animes.push(anime as Ianime);
         }
-
       }
       return { message: "Success", animes: animes };
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
       return { message: "An error occurred", error: error.message };
     }
   }

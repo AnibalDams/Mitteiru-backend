@@ -1,10 +1,7 @@
 import type { Request, Response } from "express";
 import Character from "../../classes/characters";
 
-export default async function getCharacterById(
-  req: Request,
-  res: Response
-) {
+export default async function getCharacterById(req: Request, res: Response) {
   try {
     const characterId = req.params.id;
 
@@ -24,11 +21,12 @@ export default async function getCharacterById(
         res.statusCode = 500;
         return res.json(relatedAnimes);
     }
-  }catch (error) {
+  } catch (error) {
     console.error(error);
     res.statusCode = 500;
     return res.json({
       message: "An error has occurred while fetching related animes",
       error: (error as Error).message,
     });
-  }}
+  }
+}

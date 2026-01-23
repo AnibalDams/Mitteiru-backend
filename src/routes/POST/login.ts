@@ -5,8 +5,8 @@ export default async function signUp(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
     const user = new User("", email, password);
-    const getUser =await user.login();
- 
+    const getUser = await user.login();
+
     switch (getUser.message) {
       case "Invalid Email":
         res.statusCode = 200;

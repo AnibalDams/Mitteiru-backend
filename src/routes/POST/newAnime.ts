@@ -26,29 +26,29 @@ export default async function newAnime(req: Request, res: Response) {
       image,
       onGoing,
       horizontalImage,
-      genres
+      genres,
     );
 
     let createAnime = await anime.new();
     switch (createAnime.message) {
-      case "The anime has been created successfully" :
+      case "The anime has been created successfully":
         res.statusCode = 201;
         res.json(createAnime);
         break;
       case "The anime has been updated successfully":
         res.statusCode = 200;
         res.json(createAnime);
-        break
+        break;
       case "An error has occurred while creating an Anime":
-        res.statusCode = 500
+        res.statusCode = 500;
         res.json(createAnime);
         break;
 
       default:
         break;
     }
-  } catch (error:any) {
-    res.statusCode = 500
-    res.json({ message: "There was an error",error:error.message });
+  } catch (error: any) {
+    res.statusCode = 500;
+    res.json({ message: "There was an error", error: error.message });
   }
 }

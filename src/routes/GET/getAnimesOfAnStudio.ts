@@ -4,7 +4,14 @@ import type { Response, Request } from "express";
 export default async function getAnimesOfAnStudio(req: Request, res: Response) {
   try {
     const studio = req.params.studio;
-    const animes =await new Anime("", "", "", "", "", studio).getAnimesOfAnStudio();
+    const animes = await new Anime(
+      "",
+      "",
+      "",
+      "",
+      "",
+      studio,
+    ).getAnimesOfAnStudio();
     switch (animes.message) {
       case "success":
         res.statusCode = 200;

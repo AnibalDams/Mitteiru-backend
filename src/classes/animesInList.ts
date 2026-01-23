@@ -2,7 +2,7 @@ import dbClient from "../libs/dbClient";
 import { Anime } from "./animes";
 import { ObjectId } from "mongodb";
 import type ReturnData from "../libs/types/returnData";
-import type { Anime_ as Ianime} from "../libs/types/Anime";
+import type { Anime_ as Ianime } from "../libs/types/Anime";
 
 export default class AnimeInList {
   id: string;
@@ -17,24 +17,26 @@ export default class AnimeInList {
   }
 
   async addToList(): Promise<ReturnData> {
-
     try {
-      await dbClient.collection("animeList").insertOne({ animeId: this.animeId, listId:this.listId })
+      await dbClient
+        .collection("animeList")
+        .insertOne({ animeId: this.animeId, listId: this.listId });
       return { message: "success" };
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
       return { message: "An error occurred", error: error.message };
     }
   }
 
   async removeFromList(): Promise<ReturnData> {
     try {
+      await dbClient
+        .collection("animeList")
+        .findOneAndDelete({ animeId: this.animeId, listId: this.listId });
 
-      await dbClient.collection("animeList").findOneAndDelete({ animeId: this.animeId, listId:this.listId })
-      
       return { message: "success" };
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
 
       return { message: "An error occurred", error: error.message };
     }
@@ -44,19 +46,31 @@ export default class AnimeInList {
     let animes = [];
 
     try {
-      const allLists = await dbClient.collection("lists").find({ profileId: new ObjectId(this.profileId) }).toArray()
+      const allLists = await dbClient
+        .collection("lists")
+        .find({ profileId: new ObjectId(this.profileId) })
+        .toArray();
       for (let i = 0; i < allLists.length; i++) {
         const list = allLists[i];
-        const animesInList = await dbClient.collection("animeList").find({ listId: list._id.toString() }).toArray()
+        const animesInList = await dbClient
+          .collection("animeList")
+          .find({ listId: list._id.toString() })
+          .toArray();
         for (let i = 0; i < animesInList.length; i++) {
-          const anime_ = (await new Anime(animesInList[i].animeId.toString()).getById()).animes;
+          const anime_ = (
+            await new Anime(animesInList[i].animeId.toString()).getById()
+          ).animes;
 
-          animes.push({...anime_,listId:list._id,id2:animesInList[i]._id});
+          animes.push({
+            ...anime_,
+            listId: list._id,
+            id2: animesInList[i]._id,
+          });
         }
       }
-      return { message: "success", animes: animes }
+      return { message: "success", animes: animes };
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
       return { message: "An error occurred", error: error.message };
     }
   }

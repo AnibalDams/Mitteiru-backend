@@ -3,8 +3,11 @@ import Episode from "../../classes/episodes";
 
 export default async function addLikeToComment(req: Request, res: Response) {
   try {
-    const { commentId, profileId,episodeId } = req.params;
-    const addLike = await new Episode(episodeId).addLikeToComment(commentId, profileId);
+    const { commentId, profileId, episodeId } = req.params;
+    const addLike = await new Episode(episodeId).addLikeToComment(
+      commentId,
+      profileId,
+    );
     switch (addLike.message) {
       case "The comment does not exist":
         res.statusCode = 404;

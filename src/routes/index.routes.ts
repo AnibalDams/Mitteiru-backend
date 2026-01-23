@@ -31,8 +31,9 @@ import addLikeToAnime from "./POST/addLike"; // Agrega un "like" a un anime.
 import addReview from "./POST/addReview"; // Crea una reseña para un anime.
 import addLikeToComment from "./POST/addLikeToComment"; // Agrega un "like" a un comentario.
 import addCharacterToAnime from "./POST/addCharacter"; // Agrega un personaje a un anime
-import newAdminUser from "./POST/newAdminUser";  // Agrega un nuevo administrador sin ser aceptado aun
+import newAdminUser from "./POST/newAdminUser"; // Agrega un nuevo administrador sin ser aceptado aun
 import adminLogin from "./POST/adminLogin"; // Login para usuarios administradores
+import addLearningProgress from "./POST/addLearningProgress"; // Agrega un progreso de aprendizaje a un anime (para estudiantes de japones)
 
 // ---------------------------
 // Importación de módulos GET
@@ -59,10 +60,12 @@ import getCommentLikes from "./GET/getCommentLikes"; // Obtiene tanto el conteo 
 import getCharacterOfAnAnime from "./POST/getCharacters"; // Obtiene los personajes de un anime en especifico
 import getCharacterRelatedAnime from "./GET/getCharacterRelatedAnime"; // Obtiene los animes relacionados a un personaje
 import getCharacterById from "./GET/getCharacterById"; // Obtiene un personaje por su ID
-import getRandomAnime from "./GET/getRandomAnime";  // Obtiene un anime random de la base de datos
+import getRandomAnime from "./GET/getRandomAnime"; // Obtiene un anime random de la base de datos
 import getComments from "./GET/getComments"; // Obtiene los comentarios de un episodio.
 import getAllUsers from "./GET/getAllUser"; // Obtiene todos los usuarios por paginacion
 import getAnimesCount from "./GET/getAnimeCount"; // Obtiene el total de animes en la base de datos
+import getLearningProgress from "./GET/getLearningProgress"; // Obtiene el progreso de aprendizaje de un anime
+
 
 // ------------------------------
 // Importación de módulos DELETE
@@ -79,7 +82,6 @@ import deleteUser from "./DELETE/deleteUser"; // Elimina un usuario y todos sus 
 import updateProfile from "./PUT/updateProfile"; // Actualiza información de un perfil.
 import updateAnime from "./PUT/updateAnime"; // Actualiza información de un anime.
 import updateEpisode from "./PUT/updateEpisode"; // Actualiza informacion de un episodio
-
 
 // Crear el Router principal de Express
 const route = Router();
@@ -109,7 +111,7 @@ route.get("/anime/d/all", getAllAnimes);
 
 // Obtiene la cantidad de animes disponibles
 
-route.get("/anime/d/count", getAnimesCount)
+route.get("/anime/d/count", getAnimesCount);
 
 // Obtener un anime random
 route.get("/anime/d/random", getRandomAnime);
@@ -147,6 +149,10 @@ route.get("/anime/:animeId/review/:reviewId", getReviewById);
 // Obtener personajes de un anime en especifico
 
 route.get("/anime/:animeId/character/all", getCharacterOfAnAnime);
+
+// Obtener el progreso de aprendizaje de un anime (para estudiantes de japones)
+route.get("/anime/:animeId/learningProgress/:profileId", getLearningProgress)
+
 
 // Obtener los animes relacionados a un personaje
 route.get("/character/:id/relatedAnimes", getCharacterRelatedAnime);
@@ -211,11 +217,15 @@ route.post("/anime/episode/:episodeId/comment/new", newComment);
 // Agregar un "like" a un comentario.
 route.post(
   "/anime/episode/:episodeId/comment/:commentId/like/:profileId",
-  addLikeToComment
+  addLikeToComment,
 );
 
 // Agregar un personaje al anime
 route.post("/anime/:animeId/character/new", addCharacterToAnime);
+
+// Agregar progreso de aprendizaje en anime
+route.post("/anime/:animeId/learningProgress/:profileId", addLearningProgress)
+
 
 // ================================
 // Rutas PUT - Actualización de datos
@@ -232,19 +242,17 @@ route.put("/anime/episode/:episodeId", auth, updateEpisode);
 // ================================
 
 // Eliminar un anime
-route.delete("/anime/:animeId", auth, deleteAnime)
+route.delete("/anime/:animeId", auth, deleteAnime);
 
 // Eliminar un episodio determinado
-route.delete("/anime/episode/:episodeId", auth, deleteEpisode)
+route.delete("/anime/episode/:episodeId", auth, deleteEpisode);
 
 // --- Operaciones sobre Usuarios ---
-
 
 // ================================
 // Rutas GET - Consultas de datos
 // ================================
-route.get("/user/d/all", auth, getAllUsers)
-
+route.get("/user/d/all", auth, getAllUsers);
 
 // ================================
 // Rutas POST - Creación y modificación de datos
@@ -256,12 +264,11 @@ route.post("/user/new", signUp);
 // Inicio de sesión.
 route.post("/user/login", login);
 
-
 // ================================
 // Rutas DELETE - Eliminación de datos
 // ================================
 
-route.delete("/user/:userId", auth, deleteUser)
+route.delete("/user/:userId", auth, deleteUser);
 
 // --- Operaciones sobre Perfiles ---
 // Crear un nuevo perfil para un usuario.
@@ -270,7 +277,7 @@ route.post("/user/:userId/profile/d/new", newProfile);
 // Agregar un episodio al historial de visualización de un perfil.
 route.post(
   "/user/profile/:profileId/history/:animeId/:episodeNumber/add",
-  addToHistory
+  addToHistory,
 );
 
 // --- Operaciones sobre Listas ---
@@ -280,13 +287,12 @@ route.post("/user/profile/:profileId/list/new", newList);
 // Agregar un anime a una lista.
 route.post("/anime/:animeId/list/:listId/add", addAnimeToList);
 
-// -- Operaciones sobre Administradores -- 
+// -- Operaciones sobre Administradores --
 // Crear un nuevo usuario administrador
 route.post("/admin/new", newAdminUser);
 
 // Login para ingreso del administrador
 route.post("/admin/login", adminLogin);
-
 
 // ================================
 // Rutas DELETE - Eliminación de datos
@@ -307,8 +313,6 @@ route.delete("/user/profile/list/:listId/anime/:animeId", removeAnimeFromList);
 
 // Actualizar información de un perfil.
 route.put("/user/profile/:profileId", updateProfile);
-
-
 
 // Exportar el Router para uso en la aplicación
 export default route;

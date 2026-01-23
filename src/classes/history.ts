@@ -19,7 +19,7 @@ export default class History {
     animeId: string,
     episodeNumber: number,
     date: number,
-    profileId: string
+    profileId: string,
   ) {
     this.id = id;
     this.animeId = animeId;
@@ -33,7 +33,12 @@ export default class History {
       const today = new Date().getTime();
       const todayString = new Date(today).toISOString().substring(0, 10);
 
-      const isThereAnime: any = await historyCollection.find({ profileId: new ObjectId(this.profileId), animeId: new ObjectId(this.animeId) }).toArray()
+      const isThereAnime: any = await historyCollection
+        .find({
+          profileId: new ObjectId(this.profileId),
+          animeId: new ObjectId(this.animeId),
+        })
+        .toArray();
 
       const dates: any = {};
       for (let i = 0; i < isThereAnime.length; i++) {
@@ -42,15 +47,17 @@ export default class History {
         dates[animeDate] = animeDate;
       }
       if (!dates[todayString]) {
-        await historyCollection.insertOne({ animeId: new ObjectId(this.animeId), episodeNumber: this.episodeNumber, date: today, profileId: new ObjectId(this.profileId) })
-
-
+        await historyCollection.insertOne({
+          animeId: new ObjectId(this.animeId),
+          episodeNumber: this.episodeNumber,
+          date: today,
+          profileId: new ObjectId(this.profileId),
+        });
       }
-
 
       return { message: "Success" };
     } catch (error: any) {
-      console.error(error)
+      console.error(error);
       return {
         message: "An error has occurred while adding the History",
         error: error.message,
@@ -60,15 +67,18 @@ export default class History {
 
   async get(): Promise<ReturnData> {
     try {
-      const getHistory = await historyCollection.find({ profileId: new ObjectId(this.profileId) }).sort({ date: -1 }).toArray()
+      const getHistory = await historyCollection
+        .find({ profileId: new ObjectId(this.profileId) })
+        .sort({ date: -1 })
+        .toArray();
 
       const history: any = [];
 
       if (getHistory.length > 0) {
         for (let i = 0; i < getHistory.length; i++) {
           const animeH = getHistory[i];
-          const anime = await new Anime(animeH.animeId).getById()
-          history.push({ date: animeH.date, ...anime.animes })
+          const anime = await new Anime(animeH.animeId).getById();
+          history.push({ date: animeH.date, ...anime.animes });
         }
       }
       const dates: any = [];
@@ -85,7 +95,7 @@ export default class History {
         const date = new Date(log.date).toISOString();
         if (dates.find((e: any) => e.date === date.substring(0, 10))) {
           const index = dates.findIndex(
-            (e: any) => e.date === date.substring(0, 10)
+            (e: any) => e.date === date.substring(0, 10),
           );
           dates[index].animes.push(log);
         }
@@ -102,30 +112,12 @@ export default class History {
 
   static async delete(id: string): Promise<ReturnData> {
     try {
-      const verify = await historyCollection.findOne({ _id: new ObjectId(id) })
+      const verify = await historyCollection.findOne({ _id: new ObjectId(id) });
       if (!verify) {
         return { message: "History log not found" };
       }
-      await historyCollection.deleteOne({ _id: new ObjectId(id) })
+      await historyCollection.deleteOne({ _id: new ObjectId(id) });
       return { message: "Success" };
-
-    }
-    catch (error: any) {
-      return { message: "An error has occurred while deleting the History", error: error.message }
-    }
-  }
-
-  static async deleteFromProfile(profileId: ObjectId): Promise<ReturnData> {
-    try {
-      const verify = await historyCollection.find({ profileId: profileId }).toArray();
-      if (!verify || verify.length === 0) {
-        return { message: "History not found" };
-      }
-      for (const history of verify) {
-        await historyCollection.deleteOne({ _id: history._id })
-      }
-      return { message: "Success" };
-
     } catch (error: any) {
       return {
         message: "An error has occurred while deleting the History",
@@ -134,4 +126,23 @@ export default class History {
     }
   }
 
+  static async deleteFromProfile(profileId: ObjectId): Promise<ReturnData> {
+    try {
+      const verify = await historyCollection
+        .find({ profileId: profileId })
+        .toArray();
+      if (!verify || verify.length === 0) {
+        return { message: "History not found" };
+      }
+      for (const history of verify) {
+        await historyCollection.deleteOne({ _id: history._id });
+      }
+      return { message: "Success" };
+    } catch (error: any) {
+      return {
+        message: "An error has occurred while deleting the History",
+        error: error.message,
+      };
+    }
+  }
 }

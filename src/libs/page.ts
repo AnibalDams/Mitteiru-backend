@@ -47,4 +47,4 @@ export let htmlPage = `
 </body>
 </html>
 
-`
+`;

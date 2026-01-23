@@ -6,7 +6,13 @@ export default async function addToHistory(req: Request, res: Response) {
     const animeId = req.params.animeId;
     const episodeNumber = Number(req.params.episodeNumber);
     const profileId = req.params.profileId;
-    const history = await new History("", animeId, episodeNumber, 0,profileId).add();
+    const history = await new History(
+      "",
+      animeId,
+      episodeNumber,
+      0,
+      profileId,
+    ).add();
     switch (history.message) {
       case "Success":
         res.statusCode = 201;
