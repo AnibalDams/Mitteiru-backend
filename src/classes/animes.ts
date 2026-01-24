@@ -141,9 +141,24 @@ export class Anime {
   }
 
   // Trae los últimos 10 animes agregados (para la página de inicio)
-  async getAll(): Promise<ReturnData> {
+  async getTenLatest(): Promise<ReturnData> {
     try {
       const animes = (await animeCollection.find().limit(10).toArray()).sort(
+        (a, b) => b.createdAt - a.createdAt,
+      );
+      return { message: "animes found", animes: animes };
+    } catch (error: any) {
+      console.log(error);
+      return {
+        message: "An error has occurred while getting animes",
+        error: error.message,
+      };
+    }
+  }
+
+  static async getAll(): Promise<ReturnData> {
+        try {
+      const animes = (await animeCollection.find().toArray()).sort(
         (a, b) => b.createdAt - a.createdAt,
       );
       return { message: "animes found", animes: animes };
@@ -377,6 +392,7 @@ export class Anime {
     try {
       const mostLikedAnimes = await animeCollection
         .find()
+        .limit(10)
         .sort({ likes: -1 })
         .toArray();
       return { message: "success", animes: mostLikedAnimes };

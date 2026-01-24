@@ -3,16 +3,16 @@ import type { Response, Request } from "express";
 
 export default async function getAnimes(req: Request, res: Response) {
   try {
-    const getAllAnimes = await Anime.getAll();
+    const getAnimes = await new Anime().getTenLatest();
 
-    switch (getAllAnimes.message) {
+    switch (getAnimes.message) {
       case "animes found":
         res.statusCode = 200;
-        res.json(getAllAnimes);
+        res.json(getAnimes);
         break;
       case "An error has occurred while getting animes":
         res.statusCode = 500;
-        res.json(getAllAnimes);
+        res.json(getAnimes);
         break;
       default:
         break;

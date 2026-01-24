@@ -82,6 +82,7 @@ import deleteUser from "./DELETE/deleteUser"; // Elimina un usuario y todos sus 
 import updateProfile from "./PUT/updateProfile"; // Actualiza información de un perfil.
 import updateAnime from "./PUT/updateAnime"; // Actualiza información de un anime.
 import updateEpisode from "./PUT/updateEpisode"; // Actualiza informacion de un episodio
+import getTenLatest from "./GET/getTenLatest";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -108,6 +109,9 @@ route.get("/anime/:animeId", getAnimeById);
 // Obtener todos los animes.
 // Se utiliza "/d/" para rutas fijas, evitando conflicto con los parámetros.
 route.get("/anime/d/all", getAllAnimes);
+
+// Obtiene los ultimos 10 animes agregatos
+route.get("/anime/d/latest", getTenLatest);
 
 // Obtiene la cantidad de animes disponibles
 
