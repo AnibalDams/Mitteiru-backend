@@ -83,6 +83,7 @@ import updateProfile from "./PUT/updateProfile"; // Actualiza información de un
 import updateAnime from "./PUT/updateAnime"; // Actualiza información de un anime.
 import updateEpisode from "./PUT/updateEpisode"; // Actualiza informacion de un episodio
 import getTenLatest from "./GET/getTenLatest";
+import animeFullDetails from "./GET/animeFullDetails";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -105,6 +106,10 @@ route.get("/user/decode", decodeToken);
 
 // Detalles de un anime específico (ruta dinámica por :animeId).
 route.get("/anime/:animeId", getAnimeById);
+
+// Informacion completa de un anime
+route.get("/anime/:animeId/fullDetails", animeFullDetails);
+
 
 // Obtener todos los animes.
 // Se utiliza "/d/" para rutas fijas, evitando conflicto con los parámetros.
@@ -137,7 +142,7 @@ route.get("/anime/:animeId/similar", getSimilarAnimes);
 
 // Contar "likes" de un anime.
 route.get("/anime/:animeId/likes/count", getLikes);
-
+ 
 // Animes de un género específico.
 route.get("/anime/genre/:genre", getAnimesOfAGenre);
 
@@ -167,7 +172,7 @@ route.get("/character/:id", getCharacterById);
 // -------------------------------
 // Rutas de Episodios (GET)
 // -------------------------------
-
+ 
 // Obtener todos los episodios de un anime.
 route.get("/anime/:animeId/episode/all", getEpisodes);
 
