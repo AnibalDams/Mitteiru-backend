@@ -143,9 +143,9 @@ export class Anime {
   // Trae los últimos 10 animes agregados (para la página de inicio)
   async getTenLatest(): Promise<ReturnData> {
     try {
-      const animes = (await animeCollection.find().limit(10).toArray()).sort(
-        (a, b) => b.createdAt - a.createdAt,
-      );
+      const animes = await animeCollection.find().limit(10).sort({
+        createdAt: -1,
+      }).toArray();
       return { message: "animes found", animes: animes };
     } catch (error: any) {
       console.log(error);
