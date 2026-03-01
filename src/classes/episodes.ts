@@ -33,7 +33,18 @@ export default class Episode {
     this.link = link;
     this.animeId = animeId;
   }
-
+  static async checkEpisode(episideId:any):Promise<boolean>{
+    try {
+      const episode = await episodeCollection.findOne({_id:new ObjectId(episideId)})
+      if (!episode) {
+        return false
+      }
+      return true       
+    } catch (error:any) {
+      console.error(error)
+      return false
+    }
+  }
   async new(): Promise<ReturnData> {
     try {
       let type = this.link.split(".")[this.link.split(".").length - 1];
@@ -87,14 +98,14 @@ export default class Episode {
     }
   }
 
-  async getAll(): Promise<ReturnData> {
+  static async getAll(animeId:string): Promise<ReturnData> {
     try {
-      const doesTheAnimeExist = await new Anime(this.animeId).getById();
+      const doesTheAnimeExist = await new Anime(animeId).getById();
       if (!doesTheAnimeExist.animes === null) {
         return { message: "The anime does not exist" };
       }
       const episodes = await episodeCollection
-        .find({ animeId: new ObjectId(this.animeId) })
+        .find({ animeId: new ObjectId(animeId) })
         .toArray();
       return { message: "success", episodes: episodes };
     } catch (error: any) {

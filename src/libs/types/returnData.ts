@@ -3,7 +3,7 @@ import type { AdminUser } from "../../classes/interfaces/AdminUser";
 import type { Episode } from "../../classes/interfaces/Episodes";
 import type { Anime_ as Ianime } from "./Anime";
 import type LearningProgress from "../../classes/interfaces/LearningProgress";
-
+import type EpisodeLearningProgress from "../../classes/interfaces/EpisodeLearningProgress";
 interface List {
   id: number;
   name: string;
@@ -26,4 +26,6 @@ export default interface ReturnData {
   characters?: Character | Character[];
   AdminUser?: AdminUser | AdminUser[];
   learningProgress?:LearningProgress | LearningProgress[];
+  episodeLearningProgress?:EpisodeLearningProgress|EpisodeLearningProgress[]
+  statusCode?:number
 }

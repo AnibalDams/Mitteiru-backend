@@ -84,6 +84,7 @@ import updateAnime from "./PUT/updateAnime"; // Actualiza información de un ani
 import updateEpisode from "./PUT/updateEpisode"; // Actualiza informacion de un episodio
 import getTenLatest from "./GET/getTenLatest";
 import animeFullDetails from "./GET/animeFullDetails";
+import addEpisodeLearningProgress from "./POST/addEpisodeLearningProgress";
 
 // Crear el Router principal de Express
 const route = Router();
@@ -234,6 +235,10 @@ route.post("/anime/:animeId/character/new", addCharacterToAnime);
 
 // Agregar progreso de aprendizaje en anime
 route.post("/anime/:animeId/learningProgress/:profileId", addLearningProgress)
+
+
+// Agregar progreso de aprendizaje en episodio de un anime
+route.post("/anime/:animeId/episode/:episodeId/learningProgress/:profileId", addEpisodeLearningProgress)
 
 
 // ================================

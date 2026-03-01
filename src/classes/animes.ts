@@ -52,6 +52,18 @@ export class Anime {
     this.genres = genres;
   }
 
+  static async existAnime(animeId:string):Promise<boolean>{
+    try {
+      const verifyAnime = await animeCollection.findOne({_id:new ObjectId(animeId)});
+      if (!verifyAnime) {
+        return false
+      }
+      return true
+    } catch (error:any) {
+      console.error(error)
+      return false
+    }
+  }
   // 3. MÉTODO MAESTRO: GUARDAR / ACTUALIZAR
   // Este método es inteligente:
   // - Si el anime ya existe (por nombre), actualiza sus datos.
