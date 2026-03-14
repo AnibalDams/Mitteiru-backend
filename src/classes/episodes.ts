@@ -15,6 +15,8 @@ export default class Episode {
   synopsis: string;
   link: string;
   animeId: string;
+  profileId:string
+  isGlobal:boolean
 
   constructor(
     id: string = "",
@@ -24,6 +26,9 @@ export default class Episode {
     synopsis: string = "",
     link: string = "",
     animeId: string = "",
+    profileId:string = "",
+    isGlobal:boolean
+
   ) {
     this.id = id;
     this.name = name;
@@ -32,6 +37,8 @@ export default class Episode {
     this.thumbnail = thumbnail;
     this.link = link;
     this.animeId = animeId;
+    this.profileId = profileId
+    this.isGlobal = isGlobal
   }
   static async checkEpisode(episideId:any):Promise<boolean>{
     try {
@@ -85,6 +92,8 @@ export default class Episode {
           animeId: new ObjectId(this.animeId),
           episodeNumber: this.episodeNumber,
           external: externalVideo,
+          profileId:this.profileId,
+          isGlobal:this.isGlobal
         });
 
         return { message: "The episode was added to the anime" };

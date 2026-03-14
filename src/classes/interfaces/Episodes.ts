@@ -8,6 +8,7 @@ export interface Episode {
   link: string;
   animeId: string | ObjectId;
   episodeNumber: number;
-  profileId?:string
+  profileId?:string;
+  isGlobal:boolean;
   external: boolean;
 }

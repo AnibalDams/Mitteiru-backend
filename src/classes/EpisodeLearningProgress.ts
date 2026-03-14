@@ -23,10 +23,10 @@ export default class EpisodeLearningProgress {
     score: number,
     notes: string,
     understandingDegree: number,
-) {
+  ) {
     this.episideId = episodeId;
     this.animeId = animeId;
-    this.profileId = profileId
+    this.profileId = profileId;
     this.score = score;
     this.notes = notes;
     this.understandingDegree = understandingDegree;
@@ -78,7 +78,7 @@ export default class EpisodeLearningProgress {
       const episodeLearningProgress = {
         episodeId: this.episideId,
         animeId: this.animeId,
-        profileId:this.profileId,
+        profileId: this.profileId,
         notes: this.notes,
         score: this.score,
         understandingDegree: this.understandingDegree,
@@ -91,6 +91,35 @@ export default class EpisodeLearningProgress {
       return {
         message: "Added",
         statusCode: 201,
+      };
+    } catch (error: any) {
+      console.error(error);
+      return {
+        message: "An error has happened",
+        error: error.message,
+        statusCode: 500,
+      };
+    }
+  }
+  static async getEpisodeLearningProgress(
+    episodeId: string,
+  ): Promise<ReturnData> {
+    try {
+      const episodeLearningProgress =
+        await EpisodeLearningProgressCollection.findOne({
+          _id: new ObjectId(episodeId),
+        });
+
+      if (!episodeLearningProgress) {
+        return {
+          message: "Episode learning progress not found",
+          statusCode: 404,
+        };
+      }
+      return {
+        message: "Success",
+        episodeLearningProgress: episodeLearningProgress,
+        statusCode: 200,
       };
     } catch (error: any) {
       console.error(error);

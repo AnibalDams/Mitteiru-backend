@@ -9,7 +9,7 @@ export default async function animeFullDetails(req: Request, res: Response){
         const animeId = req.params.animeId;
         const anime = await new Anime(animeId).getById();
         const likes = await new Anime(animeId).getLikes();
-        const episodes = await new Episode("", "", 0, "", "", "", animeId).getAll();
+        const episodes = await Episode.getAll(animeId);
         const similarAnime = await new Anime(animeId).getSimilar();
         const characters = await Character.getCharacterOfAnAnime(animeId);
         const reviews = await new Anime(animeId).getAllReviews();
