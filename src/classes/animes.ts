@@ -52,14 +52,14 @@ export class Anime {
     this.genres = genres;
   }
 
-  static async existAnime(animeId:string):Promise<boolean>{
+  static async existAnime(animeId: string): Promise<boolean> {
     try {
-      const verifyAnime = await animeCollection.findOne({_id:new ObjectId(animeId)});
+      const verifyAnime = await animeCollection.findOne({ _id: new ObjectId(animeId) });
       if (!verifyAnime) {
         return false
       }
       return true
-    } catch (error:any) {
+    } catch (error: any) {
       console.error(error)
       return false
     }
@@ -169,7 +169,7 @@ export class Anime {
   }
 
   static async getAll(): Promise<ReturnData> {
-        try {
+    try {
       const animes = (await animeCollection.find().toArray()).sort(
         (a, b) => b.createdAt - a.createdAt,
       );
@@ -273,32 +273,40 @@ export class Anime {
   // 3. Busca otros animes con ese género.
   async getSimilar(): Promise<ReturnData> {
     try {
-      const animeG: any = await animeCollection.findOne({
-        _id: new ObjectId(this.id),
-      });
+      const targetId = new ObjectId(this.id);
 
-      if (animeG === null) {
-        return { message: "no anime found" };
+      // 1. PROYECCIÓN: Traer SOLO el array de géneros de la base de datos.
+      // Esto ahorra ancho de banda y memoria RAM al no cargar toda la data del anime.
+      const currentAnime = await animeCollection.findOne(
+        { _id: targetId },
+        { projection: { genres: 1 } }
+      );
+
+      if (!currentAnime || !currentAnime.genres || currentAnime.genres.length === 0) {
+        return { message: "No anime found or no genres available" };
       }
-      // Elige un índice al azar de la lista de géneros
-      const randomNumber = getRandomInt(0, animeG.genres.length - 1);
-      const animes: any[] = [];
 
-      // Usa la clase Genre para buscar coincidencias
-      const allAnimes = (
-        await new Genre("", animeG.genres[randomNumber]).getAnimes()
-      ).animes;
+      // 2. Elegir un género al azar
+      const randomGenre = currentAnime.genres[Math.floor(Math.random() * currentAnime.genres.length)];
 
-      // Filtra para no recomendar el mismo anime que estás viendo
-      if (allAnimes && Array.isArray(allAnimes)) {
-        for (let i = 0; i < allAnimes.length; i++) {
-          const anime = allAnimes[i];
-          if (new ObjectId(anime._id).toString() != this.id) {
-            animes.push(anime);
+      // 3. AGGREGATION PIPELINE: Dejar que MongoDB filtre y seleccione al azar.
+      const similarAnimes = await animeCollection.aggregate([
+        {
+          $match: {
+            genres: randomGenre,      // Que contenga el género aleatorio
+            _id: { $ne: targetId }    // Que NO sea el anime que estamos viendo
           }
+        },
+        {
+          $sample: { size: 1 }        // Magia pura: MongoDB selecciona 1 documento al azar de los que coinciden
         }
+      ]).toArray();
+
+      if (similarAnimes.length === 0) {
+        return { message: "No similar animes found" };
       }
-      return { message: "success", animes: animes };
+
+      return { message: "success", animes: similarAnimes[0] as Ianime };
     } catch (error: any) {
       console.error(error);
       return {
